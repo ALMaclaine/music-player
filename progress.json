@@ -25,7 +25,8 @@
         {"name": "Update README with Project Information", "status": "completed"},
         {"name": "Update Git Workflow Prompt for Automatic Merging", "status": "completed"},
         {"name": "Set Up Environment Variables", "status": "completed"},
-        {"name": "Update Prompts with Git Workflow Reminders", "status": "completed"}
+        {"name": "Update Prompts with Git Workflow Reminders", "status": "completed"},
+        {"name": "Update Branch References to 'master' in Prompts", "status": "completed"}
       ]
     },
     {
