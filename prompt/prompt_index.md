@@ -42,4 +42,8 @@ This document serves as an index of all available prompts in the project, their 
     - Purpose: Quickly bring the AI up to speed on the current state of the project at the start of a new chat session
     - Use when: Beginning a new chat session or needing a quick refresh on the project status
 
+11. **prompt_opportunity_identifier.md**
+    - Purpose: Help identify situations where creating a new prompt would be beneficial
+    - Use when: Looking for ways to encapsulate repeatable actions or processes in the project
+
 Remember to refer to this index when you need guidance on which prompt to use for a specific task or situation in the development process.
