@@ -21,7 +21,9 @@
         {"name": "Create Refactoring Prompt", "status": "completed"},
         {"name": "Update Prompt Index", "status": "completed"},
         {"name": "Create Git Workflow Prompt", "status": "completed"},
-        {"name": "Set Up ESLint and Prettier", "status": "completed"}
+        {"name": "Set Up ESLint and Prettier", "status": "completed"},
+        {"name": "Update README with Project Information", "status": "completed"},
+        {"name": "Update Git Workflow Prompt for Automatic Merging", "status": "completed"}
       ]
     },
     {
