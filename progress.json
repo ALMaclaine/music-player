@@ -31,7 +31,7 @@
       "name": "Database Design & Backend Development",
       "status": "in_progress",
       "steps": [
-        {"name": "Choose SQLite Library", "status": "pending"},
+        {"name": "Choose SQLite Library", "status": "completed"},
         {"name": "Design Database Schema", "status": "pending"},
         {"name": "Implement Database Models", "status": "pending"},
         {"name": "Set Up API Routes", "status": "pending"},
