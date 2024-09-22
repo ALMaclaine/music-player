@@ -58,4 +58,8 @@ This document serves as an index of all available prompts in the project, their 
     - Purpose: Guide the process of identifying and executing code refactoring
     - Use when: Improving code quality, maintainability, or performance without changing external behavior
 
+15. **git_workflow_prompt.md**
+    - Purpose: Guide the process of managing git branches, committing work, and merging to master
+    - Use when: Starting a new task, committing changes, or completing a feature branch
+
 Remember to refer to this index when you need guidance on which prompt to use for a specific task or situation in the development process.
