@@ -1,7 +1,7 @@
 # Git Workflow Prompt
 
 ## Purpose
-This prompt guides the process of managing git branches for each activity/task, committing work to the appropriate branch, and merging completed work back to the master branch.
+This prompt guides the process of managing git branches for each activity/task, making micro-commits, and merging completed work back to the master branch.
 
 ## Steps
 
@@ -14,36 +14,24 @@ This prompt guides the process of managing git branches for each activity/task, 
 
 2. **Work on the Task**
    - Make necessary changes and additions for the task.
-   - Commit changes frequently with meaningful commit messages.
+   - For longer tasks, break down the work into smaller, logical units.
 
-3. **Commit Changes**
-   - Stage changes:
+3. **Make Micro-Commits**
+   - Commit changes frequently, ideally after each small, logical unit of work:
      ```
-     git add .
+     git add <relevant files>
+     git commit -m "type(scope): description of small change"
      ```
-   - Commit changes using the commit-work prompt:
-     ```
-     git commit -m "type(scope): description"
-     ```
+   - Ensure each micro-commit has a meaningful commit message.
 
-4. **Push Branch to Remote**
-   - Push the branch to the remote repository:
-     ```
-     git push -u origin feature/task-name
-     ```
-
-5. **Complete the Task**
+4. **Complete the Task**
    - Ensure all work for the task is completed and committed.
    - Run tests if applicable to ensure everything is working as expected.
 
-6. **Merge to Master**
+5. **Merge to Master**
    - Switch to the master branch:
      ```
      git checkout master
-     ```
-   - Pull the latest changes from the remote master:
-     ```
-     git pull origin master
      ```
    - Merge the feature branch into master:
      ```
@@ -51,24 +39,20 @@ This prompt guides the process of managing git branches for each activity/task, 
      ```
    - Resolve any merge conflicts if they occur.
 
-7. **Push Master to Remote**
+6. **Push Changes**
    - Push the updated master branch to the remote repository:
      ```
      git push origin master
      ```
 
-8. **Clean Up**
+7. **Clean Up**
    - Delete the local feature branch:
      ```
      git branch -d feature/task-name
      ```
-   - Delete the remote feature branch if necessary:
-     ```
-     git push origin --delete feature/task-name
-     ```
 
-9. **Update Progress**
+8. **Update Progress**
    - Update the progress.json file to reflect the completed task.
    - Commit and push the progress update to master.
 
-Remember to use this workflow for each distinct task or activity in the project. This helps maintain a clean and organized git history, and makes it easier to track and manage different features or bug fixes.
+Remember to use micro-commits for each small, logical unit of work within a task. This helps maintain a detailed and organized git history, making it easier to track progress and revert changes if necessary.
