@@ -1,23 +1,27 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import db from '../../lib/db/db';
+import { authenticateUser, generateToken, withAuth, User } from '../../lib/auth';
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
     case 'GET':
-      return getUsers(req, res);
+      return withAuth(getUsers)(req, res);
     case 'POST':
+      if (req.body.action === 'login') {
+        return login(req, res);
+      }
       return createUser(req, res);
     case 'PUT':
-      return updateUser(req, res);
+      return withAuth(updateUser)(req, res);
     case 'DELETE':
-      return deleteUser(req, res);
+      return withAuth(deleteUser)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
 
-function getUsers(req: NextApiRequest, res: NextApiResponse) {
+async function getUsers(req: NextApiRequest, res: NextApiResponse, currentUser: User) {
   try {
     const users = db.prepare('SELECT id, username, email FROM Users').all();
     res.status(200).json(users);
@@ -27,7 +31,7 @@ function getUsers(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-function createUser(req: NextApiRequest, res: NextApiResponse) {
+async function createUser(req: NextApiRequest, res: NextApiResponse) {
   const { username, email, password } = req.body;
   if (!username || !email || !password) {
     return res.status(400).json({ error: 'Missing required fields' });
@@ -42,14 +46,23 @@ function createUser(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-function updateUser(req: NextApiRequest, res: NextApiResponse) {
+async function updateUser(req: NextApiRequest, res: NextApiResponse, currentUser: User) {
   const { id } = req.query;
   const { username, email, password } = req.body;
   if (!id || (!username && !email && !password)) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
+  if (currentUser.id !== Number(id)) {
+    return res.status(403).json({ error: 'Not authorized to update this user' });
+  }
+
   try {
+    const userExists = db.prepare('SELECT id FROM Users WHERE id = ?').get(id);
+    if (!userExists) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
     let query = 'UPDATE Users SET ';
     const params = [];
     if (username) {
@@ -79,13 +92,22 @@ function updateUser(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-function deleteUser(req: NextApiRequest, res: NextApiResponse) {
+async function deleteUser(req: NextApiRequest, res: NextApiResponse, currentUser: User) {
   const { id } = req.query;
   if (!id) {
     return res.status(400).json({ error: 'Missing user id' });
   }
 
+  if (currentUser.id !== Number(id)) {
+    return res.status(403).json({ error: 'Not authorized to delete this user' });
+  }
+
   try {
+    const userExists = db.prepare('SELECT id FROM Users WHERE id = ?').get(id);
+    if (!userExists) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
     const result = db.prepare('DELETE FROM Users WHERE id = ?').run(id);
     if (result.changes === 0) {
       return res.status(404).json({ error: 'User not found' });
@@ -95,4 +117,19 @@ function deleteUser(req: NextApiRequest, res: NextApiResponse) {
     console.error('Error deleting user:', error);
     res.status(500).json({ error: 'Error deleting user' });
   }
+}
+
+async function login(req: NextApiRequest, res: NextApiResponse) {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Missing email or password' });
+  }
+
+  const user = authenticateUser(email, password);
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
+
+  const token = generateToken(user);
+  res.status(200).json({ token, user: { id: user.id, username: user.username, email: user.email } });
 }

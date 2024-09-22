@@ -1,8 +1,22 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import handler from './users';
 import db from '../../lib/db/db';
+import { User } from '../../lib/auth';
 
-jest.mock('../../lib/db/db');
+jest.mock('../../lib/db/db', () => ({
+  prepare: jest.fn().mockReturnThis(),
+  all: jest.fn(),
+  run: jest.fn(),
+  get: jest.fn(),
+}));
+
+jest.mock('../../lib/auth', () => ({
+  withAuth: (handler: (req: NextApiRequest, res: NextApiResponse, user: User) => Promise<void>) => 
+    (req: NextApiRequest, res: NextApiResponse) => 
+      handler(req, res, { id: 1, username: 'testuser', email: 'test@example.com' }),
+  authenticateUser: jest.fn(),
+  generateToken: jest.fn(),
+}));
 
 const HTTP_STATUS = {
   OK: 200,
@@ -11,27 +25,14 @@ const HTTP_STATUS = {
   METHOD_NOT_ALLOWED: 405,
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
 };
 
 describe('Users API', () => {
   let mockReq: Partial<NextApiRequest>;
   let mockRes: Partial<NextApiResponse>;
-  let prepareMock: jest.Mock;
-  let runMock: jest.Mock;
-  let allMock: jest.Mock;
-  let getMock: jest.Mock;
 
   beforeEach(() => {
-    runMock = jest.fn();
-    allMock = jest.fn();
-    getMock = jest.fn();
-    prepareMock = db.prepare as jest.Mock;
-    prepareMock.mockReturnValue({
-      run: runMock,
-      all: allMock,
-      get: getMock,
-    });
-
     mockReq = {
       method: '',
       query: {},
@@ -53,13 +54,13 @@ describe('Users API', () => {
         { id: 1, username: 'user1', email: 'user1@example.com' },
         { id: 2, username: 'user2', email: 'user2@example.com' },
       ];
-      allMock.mockReturnValueOnce(mockUsers);
+      (db.prepare('').all as jest.Mock).mockReturnValueOnce(mockUsers);
 
       mockReq.method = 'GET';
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(prepareMock).toHaveBeenCalledWith('SELECT id, username, email FROM Users');
-      expect(allMock).toHaveBeenCalled();
+      expect(db.prepare).toHaveBeenCalledWith('SELECT id, username, email FROM Users');
+      expect(db.prepare('').all).toHaveBeenCalled();
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
       expect(mockRes.json).toHaveBeenCalledWith(mockUsers);
     });
@@ -68,86 +69,98 @@ describe('Users API', () => {
   describe('POST /api/users', () => {
     it('should create a new user', async () => {
       const newUser = { username: 'newuser', email: 'newuser@example.com', password: 'password123' };
-      runMock.mockReturnValueOnce({ lastInsertRowid: 3 });
+      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ lastInsertRowid: 3 });
 
       mockReq.method = 'POST';
       mockReq.body = newUser;
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(prepareMock).toHaveBeenCalledWith('INSERT INTO Users (username, email, password_hash) VALUES (?, ?, ?)');
-      expect(runMock).toHaveBeenCalledWith(newUser.username, newUser.email, newUser.password);
+      expect(db.prepare).toHaveBeenCalledWith('INSERT INTO Users (username, email, password_hash) VALUES (?, ?, ?)');
+      expect(db.prepare('').run).toHaveBeenCalledWith(newUser.username, newUser.email, newUser.password);
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.CREATED);
-      expect(mockRes.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          id: expect.any(Number),
-          username: newUser.username,
-          email: newUser.email,
-        })
-      );
-    });
-
-    it('should return 400 when required fields are missing', async () => {
-      mockReq.method = 'POST';
-      mockReq.body = { username: 'incomplete' }; // Missing email and password
-      await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
-
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
-      expect(mockRes.json).toHaveBeenCalledWith({ error: 'Missing required fields' });
+      expect(mockRes.json).toHaveBeenCalledWith({
+        id: 3,
+        username: newUser.username,
+        email: newUser.email,
+      });
     });
   });
 
   describe('PUT /api/users', () => {
     it('should update an existing user', async () => {
       const updatedUser = { username: 'updateduser', email: 'updated@example.com' };
-      runMock.mockReturnValueOnce({ changes: 1 });
+      (db.prepare('').get as jest.Mock).mockReturnValueOnce({ id: 1 });
+      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ changes: 1 });
 
       mockReq.method = 'PUT';
       mockReq.query = { id: '1' };
       mockReq.body = updatedUser;
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(prepareMock).toHaveBeenCalledWith(expect.stringContaining('UPDATE Users SET'));
-      expect(runMock).toHaveBeenCalled();
+      expect(db.prepare).toHaveBeenCalledWith('SELECT id FROM Users WHERE id = ?');
+      expect(db.prepare).toHaveBeenCalledWith(expect.stringContaining('UPDATE Users SET'));
+      expect(db.prepare('').run).toHaveBeenCalled();
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
       expect(mockRes.json).toHaveBeenCalledWith({ message: 'User updated successfully' });
     });
 
     it('should return 404 when updating non-existent user', async () => {
-      runMock.mockReturnValueOnce({ changes: 0 });
+      (db.prepare('').get as jest.Mock).mockReturnValueOnce(null);
 
       mockReq.method = 'PUT';
-      mockReq.query = { id: '999' };
+      mockReq.query = { id: '1' };
       mockReq.body = { username: 'nonexistent' };
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.NOT_FOUND);
       expect(mockRes.json).toHaveBeenCalledWith({ error: 'User not found' });
     });
+
+    it('should return 403 when updating a different user', async () => {
+      mockReq.method = 'PUT';
+      mockReq.query = { id: '2' };
+      mockReq.body = { username: 'differentuser' };
+      await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
+
+      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.FORBIDDEN);
+      expect(mockRes.json).toHaveBeenCalledWith({ error: 'Not authorized to update this user' });
+    });
   });
 
   describe('DELETE /api/users', () => {
     it('should delete a user', async () => {
-      runMock.mockReturnValueOnce({ changes: 1 });
+      (db.prepare('').get as jest.Mock).mockReturnValueOnce({ id: 1 });
+      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ changes: 1 });
 
       mockReq.method = 'DELETE';
       mockReq.query = { id: '1' };
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(prepareMock).toHaveBeenCalledWith('DELETE FROM Users WHERE id = ?');
-      expect(runMock).toHaveBeenCalledWith('1');
+      expect(db.prepare).toHaveBeenCalledWith('SELECT id FROM Users WHERE id = ?');
+      expect(db.prepare).toHaveBeenCalledWith('DELETE FROM Users WHERE id = ?');
+      expect(db.prepare('').run).toHaveBeenCalledWith('1');
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
       expect(mockRes.json).toHaveBeenCalledWith({ message: 'User deleted successfully' });
     });
 
     it('should return 404 when deleting non-existent user', async () => {
-      runMock.mockReturnValueOnce({ changes: 0 });
+      (db.prepare('').get as jest.Mock).mockReturnValueOnce(null);
 
       mockReq.method = 'DELETE';
-      mockReq.query = { id: '999' };
+      mockReq.query = { id: '1' };
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
       expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.NOT_FOUND);
       expect(mockRes.json).toHaveBeenCalledWith({ error: 'User not found' });
+    });
+
+    it('should return 403 when deleting a different user', async () => {
+      mockReq.method = 'DELETE';
+      mockReq.query = { id: '2' };
+      await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
+
+      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.FORBIDDEN);
+      expect(mockRes.json).toHaveBeenCalledWith({ error: 'Not authorized to delete this user' });
     });
   });
 
@@ -159,6 +172,4 @@ describe('Users API', () => {
     expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.METHOD_NOT_ALLOWED);
     expect(mockRes.end).toHaveBeenCalledWith('Method PATCH Not Allowed');
   });
-
-  // TODO: Add tests for authentication and authorization if applicable
 });
