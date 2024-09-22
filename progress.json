@@ -15,7 +15,11 @@
         {"name": "Create Prompt Index", "status": "completed"},
         {"name": "Create Prompt for Creating Prompts", "status": "completed"},
         {"name": "Create Session Start Prompt", "status": "completed"},
-        {"name": "Create Prompt Opportunity Identifier", "status": "completed"}
+        {"name": "Create Prompt Opportunity Identifier", "status": "completed"},
+        {"name": "Create Testing Prompt", "status": "completed"},
+        {"name": "Create Documentation Prompt", "status": "completed"},
+        {"name": "Create Refactoring Prompt", "status": "completed"},
+        {"name": "Update Prompt Index", "status": "completed"}
       ]
     },
     {
