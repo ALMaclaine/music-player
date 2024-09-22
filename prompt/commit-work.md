@@ -1,29 +1,54 @@
-**Prompt for Commit Message Tool:**
+**Improved Prompt for Commit Message Tool:**
 
-**Input:**  
-"Use Git CLI commands to determine the changed files and generate a Conventional Commit message. Follow these steps:**
+**Objective:** 
+Generate a Conventional Commit message based on the current state of the Git repository.
 
-1. **Get Changed Files:**
-  - Use `git diff --name-only` to list the files that have been modified in the working directory.
-  - If staging specific files, use `git diff --cached --name-only` to list staged files.
+**Steps:**
 
-2. **Determine Change Type:**
-  - Analyze the diff for each file using `git diff <file>` (or `git diff --cached <file>` for staged files) to understand the nature of the changes (e.g., feature addition, bug fix, refactoring, style changes).
+1. **Assess Repository State:**
+   - Use `git status --porcelain` to get a comprehensive view of the repository state.
+   - This will show modified, added, deleted, and untracked files.
 
-3. **Generate Conventional Commit Message:**
-  - Based on the analysis, decide on a Conventional Commit type: `feat`, `fix`, `chore`, `refactor`, `test`, `docs`, `style`, or `perf`.
-  - Use the filename or directory as the scope if appropriate (e.g., `auth`, `api`, `ui`).
-  - Create a concise summary of the changes (50 characters or less).
-  - Include an optional body for more detailed context, referencing related issues or PRs if necessary.
+2. **Analyze Changes:**
+   - For modified files: `git diff <file>`
+   - For staged files: `git diff --cached <file>`
+   - For new files: Consider their purpose in the project.
+   - For deleted files: Consider the reason for deletion.
 
-**Format:**
+3. **Categorize Changes:**
+   - Group related changes (e.g., all UI-related changes, all bug fixes).
+   - Determine the primary type of change: `feat`, `fix`, `chore`, `refactor`, `test`, `docs`, `style`, or `perf`.
 
-<type>(<scope>): <short summary>
+4. **Generate Conventional Commit Message:**
+   - Format: `<type>(<scope>): <short summary>`
+   - Type: Choose the most appropriate type based on the primary change.
+   - Scope: Use the affected area of the codebase (e.g., `auth`, `ui`, `api`).
+   - Summary: Write a concise description (50 characters or less).
+   - Body: Add details if necessary, using bullet points for multiple changes.
 
-<body> ```
-Example CLI Commands:
+5. **Handle Special Cases:**
+   - For breaking changes, add `BREAKING CHANGE:` in the commit body.
+   - For addressing specific issues, use `Fixes #123` or `Closes #456` in the commit body.
 
-git diff --name-only
-git diff <file>
-Generate commit message based on the diffs.
-Output: For each file or group of related files, generate a Conventional Commit message following the provided format.
+**Format Example:**
+```
+feat(auth): implement OAuth2 login
+
+- Add OAuth2 provider integration
+- Create user authentication middleware
+- Update login UI to support new flow
+
+Closes #789
+```
+
+**Example CLI Commands:**
+```
+git status --porcelain
+git diff file1.js file2.js
+git diff --cached file3.js
+```
+
+**Output:** 
+Generate a single Conventional Commit message that encompasses all relevant changes. If changes are too diverse for a single commit, suggest splitting into multiple commits.
+
+**Note:** Always consider the project's specific guidelines and conventions when creating commit messages.
