@@ -24,7 +24,8 @@
         {"name": "Set Up ESLint and Prettier", "status": "completed"},
         {"name": "Update README with Project Information", "status": "completed"},
         {"name": "Update Git Workflow Prompt for Automatic Merging", "status": "completed"},
-        {"name": "Set Up Environment Variables", "status": "completed"}
+        {"name": "Set Up Environment Variables", "status": "completed"},
+        {"name": "Update Prompts with Git Workflow Reminders", "status": "completed"}
       ]
     },
     {

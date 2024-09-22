@@ -24,11 +24,34 @@ Use this prompt to guide the process of updating the project progress in the `pr
    - What was updated (step completed, phase changed, new step added, etc.)
    - The current phase and next pending step
 
-8. Remind to commit the changes to version control with an appropriate commit message.
+8. Git Workflow Reminder:
+   - Ensure you are on the correct feature branch for the current task.
+   - If the task is completed, prepare to merge the feature branch:
+     ```
+     git checkout main
+     git merge feature/[task-name]
+     git branch -d feature/[task-name]
+     ```
+   - If starting a new task, create a new feature branch:
+     ```
+     git checkout -b feature/[new-task-name]
+     ```
+
+9. Commit the changes to version control with an appropriate commit message:
+   ```
+   git add progress.json
+   git commit -m "docs(progress): update progress for [task/phase name]
+
+   - [Details of what was updated]
+   - Current Phase: [Phase Name] ([status])
+   - Next Step: [Next pending step]"
+   ```
+
+10. If applicable, push the changes and create a pull request.
 
 Example update summary:
 "Updated 'Set Up Monorepo with Nx' step to 'completed'.
 Current Phase: Project Setup & Planning (in_progress)
 Next Step: Version Control & Collaboration"
 
-Remember to only update based on actual progress made and to maintain the existing structure of the `progress.json` file.
+Remember to only update based on actual progress made and to maintain the existing structure of the `progress.json` file. Always follow the git workflow when making changes.
