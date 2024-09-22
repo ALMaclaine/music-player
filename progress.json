@@ -1,5 +1,5 @@
 {
-  "current_phase": 1,
+  "current_phase": 2,
   "phases": [
     {
       "name": "Project Setup & Planning",
@@ -29,8 +29,19 @@
     },
     {
       "name": "Database Design & Backend Development",
-      "status": "pending",
-      "steps": []
+      "status": "in_progress",
+      "steps": [
+        {"name": "Choose SQLite Library", "status": "pending"},
+        {"name": "Design Database Schema", "status": "pending"},
+        {"name": "Implement Database Models", "status": "pending"},
+        {"name": "Set Up API Routes", "status": "pending"},
+        {"name": "Implement CRUD Operations", "status": "pending"},
+        {"name": "Set Up Authentication", "status": "pending"},
+        {"name": "Implement File Upload for Music", "status": "pending"},
+        {"name": "Create Playlist Management Logic", "status": "pending"},
+        {"name": "Implement Search Functionality", "status": "pending"},
+        {"name": "Set Up Error Handling and Logging", "status": "pending"}
+      ]
     },
     {
       "name": "Frontend Development",
