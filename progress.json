@@ -39,7 +39,7 @@
         {"name": "Set Up API Routes", "status": "completed"},
         {"name": "Implement CRUD Operations", "status": "completed"},
         {"name": "Set Up API Tests", "status": "completed"},
-        {"name": "Set Up Authentication", "status": "pending"},
+        {"name": "Set Up Authentication", "status": "in_progress"},
         {"name": "Implement File Upload for Music", "status": "pending"},
         {"name": "Create Playlist Management Logic", "status": "completed"},
         {"name": "Implement Search Functionality", "status": "pending"},
