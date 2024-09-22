@@ -1,12 +1,12 @@
 # Git Workflow Prompt
 
 ## Purpose
-This prompt guides the process of managing git branches for each activity/task, making micro-commits, and merging completed work back to the master branch.
+This prompt guides the process of managing git branches for each activity/task, making micro-commits, and automatically merging completed work back to the master branch.
 
 ## Steps
 
-1. **Create a New Branch**
-   - Before starting a new task or activity, create a new branch:
+1. **Create and Switch to a New Branch**
+   - Before starting a new task or activity, create and switch to a new branch:
      ```
      git checkout -b feature/task-name
      ```
@@ -28,16 +28,14 @@ This prompt guides the process of managing git branches for each activity/task, 
    - Ensure all work for the task is completed and committed.
    - Run tests if applicable to ensure everything is working as expected.
 
-5. **Merge to Master**
-   - Switch to the master branch:
+5. **Automatic Merge to Master**
+   - Once the task is complete, automatically perform the following actions:
      ```
      git checkout master
-     ```
-   - Merge the feature branch into master:
-     ```
      git merge feature/task-name
+     git branch -d feature/task-name
      ```
-   - Resolve any merge conflicts if they occur.
+   - If there are merge conflicts, resolve them and commit the changes.
 
 6. **Push Changes**
    - Push the updated master branch to the remote repository:
@@ -45,14 +43,10 @@ This prompt guides the process of managing git branches for each activity/task, 
      git push origin master
      ```
 
-7. **Clean Up**
-   - Delete the local feature branch:
-     ```
-     git branch -d feature/task-name
-     ```
-
-8. **Update Progress**
+7. **Update Progress**
    - Update the progress.json file to reflect the completed task.
    - Commit and push the progress update to master.
 
 Remember to use micro-commits for each small, logical unit of work within a task. This helps maintain a detailed and organized git history, making it easier to track progress and revert changes if necessary.
+
+Note: This workflow assumes that merges can be performed without additional review. If a review process is needed, consider implementing a pull request workflow instead.
