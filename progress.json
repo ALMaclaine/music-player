@@ -9,7 +9,7 @@
         {"name": "Create Progress Tracking Methodology", "status": "completed"},
         {"name": "Set Up Progress Tracking System", "status": "completed"},
         {"name": "Set Up Monorepo with Nx", "status": "completed"},
-        {"name": "Version Control & Collaboration", "status": "pending"},
+        {"name": "Version Control & Collaboration", "status": "completed"},
         {"name": "Environment Setup", "status": "pending"}
       ]
     },
