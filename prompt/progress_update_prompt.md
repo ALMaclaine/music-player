@@ -28,7 +28,7 @@ Use this prompt to guide the process of updating the project progress in the `pr
    - Ensure you are on the correct feature branch for the current task.
    - If the task is completed, prepare to merge the feature branch:
      ```
-     git checkout main
+     git checkout master
      git merge feature/[task-name]
      git branch -d feature/[task-name]
      ```

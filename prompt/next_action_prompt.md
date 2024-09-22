@@ -7,7 +7,7 @@ Use this prompt to determine the next action to take in the project based on the
 2. Identify the current phase and the next pending step.
 
 3. Check the git workflow:
-   - Ensure you are on the main branch (usually 'master' or 'main')
+   - Ensure you are on the master branch
    - Create a new branch for the upcoming task:
      ```
      git checkout -b feature/[task-name]
