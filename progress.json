@@ -37,10 +37,10 @@
         {"name": "Design Database Schema", "status": "completed"},
         {"name": "Implement Database Models", "status": "completed"},
         {"name": "Set Up API Routes", "status": "completed"},
-        {"name": "Implement CRUD Operations", "status": "in_progress"},
+        {"name": "Implement CRUD Operations", "status": "completed"},
         {"name": "Set Up Authentication", "status": "pending"},
         {"name": "Implement File Upload for Music", "status": "pending"},
-        {"name": "Create Playlist Management Logic", "status": "pending"},
+        {"name": "Create Playlist Management Logic", "status": "completed"},
         {"name": "Implement Search Functionality", "status": "pending"},
         {"name": "Set Up Error Handling and Logging", "status": "pending"}
       ]
