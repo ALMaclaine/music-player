@@ -19,7 +19,8 @@
         {"name": "Create Testing Prompt", "status": "completed"},
         {"name": "Create Documentation Prompt", "status": "completed"},
         {"name": "Create Refactoring Prompt", "status": "completed"},
-        {"name": "Update Prompt Index", "status": "completed"}
+        {"name": "Update Prompt Index", "status": "completed"},
+        {"name": "Create Git Workflow Prompt", "status": "completed"}
       ]
     },
     {
