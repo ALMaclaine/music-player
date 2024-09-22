@@ -46,4 +46,16 @@ This document serves as an index of all available prompts in the project, their 
     - Purpose: Help identify situations where creating a new prompt would be beneficial
     - Use when: Looking for ways to encapsulate repeatable actions or processes in the project
 
+12. **testing_prompt.md**
+    - Purpose: Guide the process of creating and executing tests for the project
+    - Use when: Implementing new features, fixing bugs, or ensuring code quality
+
+13. **documentation_prompt.md**
+    - Purpose: Guide the process of creating and updating project documentation
+    - Use when: Adding new features, updating existing functionality, or improving project understanding
+
+14. **refactoring_prompt.md**
+    - Purpose: Guide the process of identifying and executing code refactoring
+    - Use when: Improving code quality, maintainability, or performance without changing external behavior
+
 Remember to refer to this index when you need guidance on which prompt to use for a specific task or situation in the development process.
