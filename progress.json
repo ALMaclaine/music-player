@@ -14,7 +14,8 @@
         {"name": "Create Development Prompts", "status": "completed"},
         {"name": "Create Prompt Index", "status": "completed"},
         {"name": "Create Prompt for Creating Prompts", "status": "completed"},
-        {"name": "Create Session Start Prompt", "status": "completed"}
+        {"name": "Create Session Start Prompt", "status": "completed"},
+        {"name": "Create Prompt Opportunity Identifier", "status": "completed"}
       ]
     },
     {
