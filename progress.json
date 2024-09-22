@@ -11,7 +11,8 @@
         {"name": "Set Up Monorepo with Nx", "status": "completed"},
         {"name": "Version Control & Collaboration", "status": "completed"},
         {"name": "Environment Setup", "status": "in_progress"},
-        {"name": "Create Development Prompts", "status": "completed"}
+        {"name": "Create Development Prompts", "status": "completed"},
+        {"name": "Create Prompt Index", "status": "completed"}
       ]
     },
     {
