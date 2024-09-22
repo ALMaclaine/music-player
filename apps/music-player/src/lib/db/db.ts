@@ -42,7 +42,7 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     playlist_id INTEGER NOT NULL,
     song_id INTEGER NOT NULL,
-    order INTEGER NOT NULL,
+    song_order INTEGER NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (playlist_id) REFERENCES Playlists(id),
     FOREIGN KEY (song_id) REFERENCES Songs(id)

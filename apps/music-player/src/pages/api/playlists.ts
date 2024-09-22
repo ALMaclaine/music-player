@@ -90,11 +90,11 @@ export function getPlaylistSongs(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const songs = db.prepare(`
-      SELECT s.id, s.title, s.artist, s.album, s.duration, ps.order
+      SELECT s.id, s.title, s.artist, s.album, s.duration, ps.song_order
       FROM Songs s
       JOIN PlaylistSongs ps ON s.id = ps.song_id
       WHERE ps.playlist_id = ?
-      ORDER BY ps.order
+      ORDER BY ps.song_order
     `).all(id);
     res.status(200).json(songs);
   } catch (error) {
@@ -110,10 +110,10 @@ export function addSongToPlaylist(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const maxOrderResult = db.prepare('SELECT MAX(order) as maxOrder FROM PlaylistSongs WHERE playlist_id = ?').get(playlist_id) as { maxOrder: number | null };
+    const maxOrderResult = db.prepare('SELECT MAX(song_order) as maxOrder FROM PlaylistSongs WHERE playlist_id = ?').get(playlist_id) as { maxOrder: number | null };
     const newOrder = (maxOrderResult.maxOrder || 0) + 1;
-    const result = db.prepare('INSERT INTO PlaylistSongs (playlist_id, song_id, order) VALUES (?, ?, ?)').run(playlist_id, song_id, newOrder);
-    res.status(201).json({ id: result.lastInsertRowid, playlist_id, song_id, order: newOrder });
+    const result = db.prepare('INSERT INTO PlaylistSongs (playlist_id, song_id, song_order) VALUES (?, ?, ?)').run(playlist_id, song_id, newOrder);
+    res.status(201).json({ id: result.lastInsertRowid, playlist_id, song_id, song_order: newOrder });
   } catch (error) {
     console.error('Error adding song to playlist:', error);
     res.status(500).json({ error: 'Error adding song to playlist' });
@@ -145,7 +145,7 @@ export function updatePlaylistSongOrder(req: NextApiRequest, res: NextApiRespons
   }
 
   try {
-    const result = db.prepare('UPDATE PlaylistSongs SET order = ? WHERE playlist_id = ? AND song_id = ?').run(new_order, playlist_id, song_id);
+    const result = db.prepare('UPDATE PlaylistSongs SET song_order = ? WHERE playlist_id = ? AND song_id = ?').run(new_order, playlist_id, song_id);
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Song not found in playlist' });
     }
