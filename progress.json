@@ -32,7 +32,7 @@
       "status": "in_progress",
       "steps": [
         {"name": "Choose SQLite Library", "status": "completed"},
-        {"name": "Design Database Schema", "status": "pending"},
+        {"name": "Design Database Schema", "status": "completed"},
         {"name": "Implement Database Models", "status": "pending"},
         {"name": "Set Up API Routes", "status": "pending"},
         {"name": "Implement CRUD Operations", "status": "pending"},
