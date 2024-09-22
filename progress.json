@@ -3,14 +3,14 @@
   "phases": [
     {
       "name": "Project Setup & Planning",
-      "status": "in_progress",
+      "status": "completed",
       "steps": [
         {"name": "Define Project Scope & Requirements", "status": "completed"},
         {"name": "Create Progress Tracking Methodology", "status": "completed"},
         {"name": "Set Up Progress Tracking System", "status": "completed"},
         {"name": "Set Up Monorepo with Nx", "status": "completed"},
         {"name": "Version Control & Collaboration", "status": "completed"},
-        {"name": "Environment Setup", "status": "in_progress"},
+        {"name": "Environment Setup", "status": "completed"},
         {"name": "Create Development Prompts", "status": "completed"},
         {"name": "Create Prompt Index", "status": "completed"},
         {"name": "Create Prompt for Creating Prompts", "status": "completed"},
@@ -23,7 +23,8 @@
         {"name": "Create Git Workflow Prompt", "status": "completed"},
         {"name": "Set Up ESLint and Prettier", "status": "completed"},
         {"name": "Update README with Project Information", "status": "completed"},
-        {"name": "Update Git Workflow Prompt for Automatic Merging", "status": "completed"}
+        {"name": "Update Git Workflow Prompt for Automatic Merging", "status": "completed"},
+        {"name": "Set Up Environment Variables", "status": "completed"}
       ]
     },
     {
