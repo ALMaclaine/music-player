@@ -38,4 +38,8 @@ This document serves as an index of all available prompts in the project, their 
    - Purpose: Guide the process of creating new prompts for the project
    - Use when: Identifying the need for a new prompt to support the development process
 
+10. **session_start_prompt.md**
+    - Purpose: Quickly bring the AI up to speed on the current state of the project at the start of a new chat session
+    - Use when: Beginning a new chat session or needing a quick refresh on the project status
+
 Remember to refer to this index when you need guidance on which prompt to use for a specific task or situation in the development process.
