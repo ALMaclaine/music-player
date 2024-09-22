@@ -70,6 +70,9 @@ devDependencies:
   '@testing-library/react':
     specifier: 15.0.6
     version: 15.0.6(@types/react@18.3.1)(react-dom@18.3.1)(react@18.3.1)
+  '@types/better-sqlite3':
+    specifier: ^7.6.11
+    version: 7.6.11
   '@types/jest':
     specifier: ^29.5.12
     version: 29.5.13
@@ -3912,6 +3915,12 @@ packages:
     resolution: {integrity: sha512-r1bzfrm0tomOI8g1SzvCaQHo6Lcv6zu0EA+W2kHrt8dyrHQxGzBBL4kdkzIS+jBMV+EYcMAEAqXqYaLJq5rOZg==}
     dependencies:
       '@babel/types': 7.25.6
+    dev: true
+
+  /@types/better-sqlite3@7.6.11:
+    resolution: {integrity: sha512-i8KcD3PgGtGBLl3+mMYA8PdKkButvPyARxA7IQAd6qeslht13qxb1zzO8dRCtE7U3IoJS782zDBAeoKiM695kg==}
+    dependencies:
+      '@types/node': 18.16.9
     dev: true
 
   /@types/body-parser@1.19.5:
