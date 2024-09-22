@@ -34,4 +34,8 @@ This document serves as an index of all available prompts in the project, their 
    - Purpose: Guide the process of handling errors and troubleshooting issues
    - Use when: Encountering errors or unexpected behavior in the code
 
+9. **create_prompt_prompt.md**
+   - Purpose: Guide the process of creating new prompts for the project
+   - Use when: Identifying the need for a new prompt to support the development process
+
 Remember to refer to this index when you need guidance on which prompt to use for a specific task or situation in the development process.
