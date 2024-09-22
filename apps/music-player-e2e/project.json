@@ -1,0 +1,9 @@
+{
+  "name": "music-player-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/music-player-e2e/src",
+  "tags": [],
+  "implicitDependencies": ["music-player"],
+  "// targets": "to see all targets run: nx show project music-player-e2e --web",
+  "targets": {}
+}
