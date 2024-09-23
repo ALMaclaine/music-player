@@ -62,4 +62,8 @@ This document serves as an index of all available prompts in the project, their 
     - Purpose: Guide the process of managing git branches, committing work, and merging to master
     - Use when: Starting a new task, committing changes, or completing a feature branch
 
+16. **prompt_refinement_prompt.md**
+    - Purpose: Guide the process of refining and improving existing prompts based on feedback and experience
+    - Use when: Identifying areas for improvement in existing prompts or receiving feedback suggesting changes
+
 Remember to refer to this index when you need guidance on which prompt to use for a specific task or situation in the development process.
