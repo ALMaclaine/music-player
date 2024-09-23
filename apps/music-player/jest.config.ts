@@ -1,10 +1,12 @@
+/* eslint-disable */
 export default {
-  displayName: 'music-player',
-  preset: '../../jest.preset.js',
+  displayName: "music-player",
+  preset: "../../jest.preset.js",
+  injectGlobals: true,
   transform: {
-    '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '@nx/react/plugins/jest',
-    '^.+\\.[tj]sx?$': ['babel-jest', { presets: ['@nx/next/babel'] }],
+    "^(?!.*\\.(js|jsx|ts|tsx|css|json)$)": "@nx/react/plugins/jest",
+    "^.+\\.[tj]sx?$": ["babel-jest", { presets: ["@nx/next/babel"] }],
   },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coverageDirectory: '../../coverage/apps/music-player',
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx"],
+  coverageDirectory: "../../coverage/apps/music-player",
 };

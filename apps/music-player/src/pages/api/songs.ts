@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import db from '../../lib/db/db';
 import { withAuth, User } from '../../lib/auth';
-import formidable, { File } from 'formidable';
+import busboy from 'busboy';
 import fs from 'fs';
 import path from 'path';
 
@@ -38,44 +38,66 @@ async function getSongs(req: NextApiRequest, res: NextApiResponse, user: User) {
 }
 
 async function createSong(req: NextApiRequest, res: NextApiResponse, user: User) {
-  const form = new formidable.IncomingForm();
-  form.uploadDir = path.join(process.cwd(), 'public/uploads');
-  form.keepExtensions = true;
+  const bb = busboy({ headers: req.headers });
+  const uploadDir = path.join(process.cwd(), 'public/uploads');
 
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      console.error('Error parsing form:', err);
+  const fields: { [key: string]: string } = {};
+  let filePath: string | null = null;
+  let fileError: Error | null = null;
+
+  bb.on('file', (name, file, info) => {
+    const filename = info.filename;
+    const saveTo = path.join(uploadDir, filename);
+    const writeStream = fs.createWriteStream(saveTo);
+
+    file.pipe(writeStream);
+
+    writeStream.on('finish', () => {
+      filePath = `/uploads/${filename}`;
+    });
+
+    writeStream.on('error', (err) => {
+      fileError = err;
+    });
+  });
+
+  bb.on('field', (name, val) => {
+    fields[name] = val;
+  });
+
+  bb.on('finish', async () => {
+    if (fileError) {
+      console.error('Error uploading file:', fileError);
       return res.status(500).json({ error: 'Error uploading file' });
     }
 
-    const { title, artist, album, duration } = fields;
-    const file = files.file as File;
+    if (!filePath) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
 
-    if (!title || !artist || !duration || !file) {
+    const { title, artist, album, duration } = fields;
+
+    if (!title || !artist || !duration) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    const oldPath = file.filepath;
-    const newPath = path.join(form.uploadDir, file.originalFilename || file.newFilename);
-
     try {
-      await fs.promises.rename(oldPath, newPath);
-      const file_path = `/uploads/${path.basename(newPath)}`;
-
-      const result = db.prepare('INSERT INTO Songs (title, artist, album, duration, file_path) VALUES (?, ?, ?, ?, ?)').run(title, artist, album, duration, file_path);
+      const result = db.prepare('INSERT INTO Songs (title, artist, album, duration, file_path) VALUES (?, ?, ?, ?, ?)').run(title, artist, album, duration, filePath);
       res.status(201).json({ 
         id: result.lastInsertRowid, 
         title, 
         artist, 
         album, 
         duration,
-        file_path 
+        file_path: filePath 
       });
     } catch (error) {
       console.error('Error creating song:', error);
       res.status(500).json({ error: 'Error creating song' });
     }
   });
+
+  req.pipe(bb);
 }
 
 async function updateSong(req: NextApiRequest, res: NextApiResponse, user: User) {

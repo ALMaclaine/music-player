@@ -1,5 +1,7 @@
+// src/pages/api/upload.ts
+
 import { NextApiRequest, NextApiResponse } from 'next';
-import formidable, { Fields, Files, File } from 'formidable';
+import busboy from 'busboy';
 import fs from 'fs';
 import path from 'path';
 
@@ -10,37 +12,60 @@ export const config = {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const form = new formidable.IncomingForm();
-  form.uploadDir = path.join(process.cwd(), 'public/uploads');
-  form.keepExtensions = true;
-
-  form.parse(req, async (err: Error | null, fields: Fields, files: Files) => {
-    if (err) {
-      console.error('Error parsing form:', err);
-      return res.status(500).json({ error: 'Error uploading file' });
+  return new Promise<void>((resolve) => { // Removed 'reject' to prevent unhandled rejections
+    if (req.method !== 'POST') {
+      res.status(405).json({ error: 'Method not allowed' });
+      return resolve();
     }
 
-    const file = files.file as File;
-    if (!file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
+    const bb = busboy({ headers: req.headers });
+    const uploadDir = path.join(process.cwd(), 'public/uploads');
 
-    const oldPath = file.filepath;
-    const newPath = path.join(form.uploadDir, file.originalFilename || file.newFilename);
+    let uploadedFile: string | null = null;
+    let fileError: Error | null = null;
 
-    try {
-      await fs.promises.rename(oldPath, newPath);
-      res.status(200).json({ 
-        message: 'File uploaded successfully',
-        filePath: `/uploads/${path.basename(newPath)}` 
+    bb.on('file', (name: string, file: NodeJS.ReadableStream, info: busboy.FileInfo) => {
+      const filename = info.filename;
+      const filePath = path.join(uploadDir, filename);
+      const writeStream = fs.createWriteStream(filePath);
+
+      // Attach error handler before piping
+      writeStream.on('error', (err) => {
+        fileError = err;
       });
-    } catch (error) {
-      console.error('Error moving file:', error);
-      res.status(500).json({ error: 'Error saving file' });
-    }
+
+      file.on('end', () => {
+        uploadedFile = filePath;
+      });
+
+      file.pipe(writeStream);
+    });
+
+    bb.on('finish', () => {
+      if (fileError) {
+        console.error('Error saving file:', fileError);
+        res.status(500).json({ error: 'Error saving file' });
+        return resolve();
+      }
+
+      if (!uploadedFile) {
+        res.status(400).json({ error: 'No file uploaded' });
+        return resolve();
+      }
+
+      res.status(200).json({
+        message: 'File uploaded successfully',
+        filePath: `/uploads/${path.basename(uploadedFile)}`,
+      });
+      return resolve();
+    });
+
+    bb.on('error', (err: Error) => { // Changed to resolve instead of reject
+      console.error('Error parsing form:', err);
+      res.status(500).json({ error: 'Error uploading file' });
+      return resolve(); // Prevent unhandled promise rejection
+    });
+
+    req.pipe(bb);
   });
 }

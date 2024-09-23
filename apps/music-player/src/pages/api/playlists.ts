@@ -1,25 +1,26 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import db from '../../lib/db/db';
+import { withAuth, User } from '../../lib/auth';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
     case 'GET':
-      return getPlaylists(req, res);
+      return withAuth(getPlaylists)(req, res);
     case 'POST':
-      return createPlaylist(req, res);
+      return withAuth(createPlaylist)(req, res);
     case 'PUT':
-      return updatePlaylist(req, res);
+      return withAuth(updatePlaylist)(req, res);
     case 'DELETE':
-      return deletePlaylist(req, res);
+      return withAuth(deletePlaylist)(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
       res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
 
-function getPlaylists(req: NextApiRequest, res: NextApiResponse) {
+async function getPlaylists(req: NextApiRequest, res: NextApiResponse, user: User) {
   try {
-    const playlists = db.prepare('SELECT id, user_id, name FROM Playlists').all();
+    const playlists = db.prepare('SELECT id, user_id, name FROM Playlists WHERE user_id = ?').all(user.id);
     res.status(200).json(playlists);
   } catch (error) {
     console.error('Error fetching playlists:', error);
@@ -27,22 +28,22 @@ function getPlaylists(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-function createPlaylist(req: NextApiRequest, res: NextApiResponse) {
-  const { user_id, name } = req.body;
-  if (!user_id || !name) {
+async function createPlaylist(req: NextApiRequest, res: NextApiResponse, user: User) {
+  const { name } = req.body;
+  if (!name) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
-    const result = db.prepare('INSERT INTO Playlists (user_id, name) VALUES (?, ?)').run(user_id, name);
-    res.status(201).json({ id: result.lastInsertRowid, user_id, name });
+    const result = db.prepare('INSERT INTO Playlists (user_id, name) VALUES (?, ?)').run(user.id, name);
+    res.status(201).json({ id: result.lastInsertRowid, user_id: user.id, name });
   } catch (error) {
     console.error('Error creating playlist:', error);
     res.status(500).json({ error: 'Error creating playlist' });
   }
 }
 
-function updatePlaylist(req: NextApiRequest, res: NextApiResponse) {
+async function updatePlaylist(req: NextApiRequest, res: NextApiResponse, user: User) {
   const { id } = req.query;
   const { name } = req.body;
   if (!id || !name) {
@@ -50,9 +51,9 @@ function updatePlaylist(req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    const result = db.prepare('UPDATE Playlists SET name = ? WHERE id = ?').run(name, id);
+    const result = db.prepare('UPDATE Playlists SET name = ? WHERE id = ? AND user_id = ?').run(name, id, user.id);
     if (result.changes === 0) {
-      return res.status(404).json({ error: 'Playlist not found' });
+      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
     }
     res.status(200).json({ message: 'Playlist updated successfully' });
   } catch (error) {
@@ -61,16 +62,16 @@ function updatePlaylist(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-function deletePlaylist(req: NextApiRequest, res: NextApiResponse) {
+async function deletePlaylist(req: NextApiRequest, res: NextApiResponse, user: User) {
   const { id } = req.query;
   if (!id) {
     return res.status(400).json({ error: 'Missing playlist id' });
   }
 
   try {
-    const result = db.prepare('DELETE FROM Playlists WHERE id = ?').run(id);
+    const result = db.prepare('DELETE FROM Playlists WHERE id = ? AND user_id = ?').run(id, user.id);
     if (result.changes === 0) {
-      return res.status(404).json({ error: 'Playlist not found' });
+      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
     }
     // Also delete all entries in PlaylistSongs for this playlist
     db.prepare('DELETE FROM PlaylistSongs WHERE playlist_id = ?').run(id);
@@ -81,14 +82,18 @@ function deletePlaylist(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-// Additional functions for managing songs within playlists
-export function getPlaylistSongs(req: NextApiRequest, res: NextApiResponse) {
+export async function getPlaylistSongs(req: NextApiRequest, res: NextApiResponse, user: User) {
   const { id } = req.query;
   if (!id) {
     return res.status(400).json({ error: 'Missing playlist id' });
   }
 
   try {
+    const playlist = db.prepare('SELECT id FROM Playlists WHERE id = ? AND user_id = ?').get(id, user.id);
+    if (!playlist) {
+      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
+    }
+
     const songs = db.prepare(`
       SELECT s.id, s.title, s.artist, s.album, s.duration, ps.song_order
       FROM Songs s
@@ -103,13 +108,18 @@ export function getPlaylistSongs(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export function addSongToPlaylist(req: NextApiRequest, res: NextApiResponse) {
+export async function addSongToPlaylist(req: NextApiRequest, res: NextApiResponse, user: User) {
   const { playlist_id, song_id } = req.body;
   if (!playlist_id || !song_id) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
+    const playlist = db.prepare('SELECT id FROM Playlists WHERE id = ? AND user_id = ?').get(playlist_id, user.id);
+    if (!playlist) {
+      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
+    }
+
     const maxOrderResult = db.prepare('SELECT MAX(song_order) as maxOrder FROM PlaylistSongs WHERE playlist_id = ?').get(playlist_id) as { maxOrder: number | null };
     const newOrder = (maxOrderResult.maxOrder || 0) + 1;
     const result = db.prepare('INSERT INTO PlaylistSongs (playlist_id, song_id, song_order) VALUES (?, ?, ?)').run(playlist_id, song_id, newOrder);
@@ -120,13 +130,18 @@ export function addSongToPlaylist(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-export function removeSongFromPlaylist(req: NextApiRequest, res: NextApiResponse) {
+export async function removeSongFromPlaylist(req: NextApiRequest, res: NextApiResponse, user: User) {
   const { playlist_id, song_id } = req.query;
   if (!playlist_id || !song_id) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
+    const playlist = db.prepare('SELECT id FROM Playlists WHERE id = ? AND user_id = ?').get(playlist_id, user.id);
+    if (!playlist) {
+      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
+    }
+
     const result = db.prepare('DELETE FROM PlaylistSongs WHERE playlist_id = ? AND song_id = ?').run(playlist_id, song_id);
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Song not found in playlist' });
@@ -138,13 +153,18 @@ export function removeSongFromPlaylist(req: NextApiRequest, res: NextApiResponse
   }
 }
 
-export function updatePlaylistSongOrder(req: NextApiRequest, res: NextApiResponse) {
+export async function updatePlaylistSongOrder(req: NextApiRequest, res: NextApiResponse, user: User) {
   const { playlist_id, song_id, new_order } = req.body;
   if (!playlist_id || !song_id || new_order === undefined) {
     return res.status(400).json({ error: 'Missing required fields' });
   }
 
   try {
+    const playlist = db.prepare('SELECT id FROM Playlists WHERE id = ? AND user_id = ?').get(playlist_id, user.id);
+    if (!playlist) {
+      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
+    }
+
     const result = db.prepare('UPDATE PlaylistSongs SET song_order = ? WHERE playlist_id = ? AND song_id = ?').run(new_order, playlist_id, song_id);
     if (result.changes === 0) {
       return res.status(404).json({ error: 'Song not found in playlist' });
