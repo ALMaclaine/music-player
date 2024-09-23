@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { usePlayerStore } from '../store/playerStore';
 
 interface Album {
   id: number;
@@ -15,12 +16,18 @@ interface AlbumListProps {
 }
 
 function AlbumList({ albums }: AlbumListProps) {
+  const setCurrentlyPlaying = usePlayerStore((state) => state.setCurrentlyPlaying);
+
   return (
     <section className="mb-8">
       <h2 className="text-xl font-semibold mb-4">Featured Albums</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {albums.map((album) => (
-          <div key={album.id} className="bg-white p-4 rounded-lg shadow">
+          <div 
+            key={album.id} 
+            className="bg-white p-4 rounded-lg shadow cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => setCurrentlyPlaying(album)}
+          >
             <div className="relative w-full pb-[100%] mb-2">
               <Image
                 src={album.cover_image}

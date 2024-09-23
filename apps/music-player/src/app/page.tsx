@@ -1,6 +1,7 @@
 import React from 'react';
 import AlbumList from '../components/AlbumList';
 import DailyMixPlaylists from '../components/DailyMixPlaylists';
+import FooterPlayer from '../components/FooterPlayer';
 
 interface Album {
   id: number;
@@ -45,6 +46,7 @@ export default async function HomePage() {
       <p className="text-gray-600 mt-4">
         This is a sample home page for our music player application.
       </p>
+      <FooterPlayer />
     </>
   );
 }

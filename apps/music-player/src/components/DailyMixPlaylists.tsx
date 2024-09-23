@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { usePlayerStore } from '../store/playerStore';
 
 interface Playlist {
   id: number;
@@ -15,8 +16,22 @@ interface DailyMixPlaylistsProps {
 }
 
 function PlaylistItem({ playlist }: { playlist: Playlist }) {
+  const setCurrentlyPlaying = usePlayerStore((state) => state.setCurrentlyPlaying);
+
+  const handleClick = () => {
+    setCurrentlyPlaying({
+      id: playlist.id,
+      title: playlist.name,
+      artist: 'Various Artists',
+      cover_image: playlist.cover_image
+    });
+  };
+
   return (
-    <div className="flex items-center space-x-4 p-2 hover:bg-gray-100 rounded">
+    <div 
+      className="flex items-center space-x-4 p-2 hover:bg-gray-100 rounded cursor-pointer"
+      onClick={handleClick}
+    >
       <div className="relative w-12 h-12 flex-shrink-0">
         <Image
           src={playlist.cover_image}
