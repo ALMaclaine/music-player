@@ -42,8 +42,8 @@
         {"name": "Set Up Authentication", "status": "completed"},
         {"name": "Implement File Upload for Music", "status": "completed"},
         {"name": "Create Playlist Management Logic", "status": "completed"},
-        {"name": "Implement Search Functionality", "status": "in_progress"},
-        {"name": "Set Up Error Handling and Logging", "status": "pending"}
+        {"name": "Implement Search Functionality", "status": "completed"},
+        {"name": "Set Up Error Handling and Logging", "status": "in_progress"}
       ]
     },
     {
