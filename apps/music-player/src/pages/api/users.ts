@@ -1,135 +1,129 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import db from '../../lib/db/db';
 import { authenticateUser, generateToken, withAuth, User } from '../../lib/auth';
+import { asyncHandler, AppError, logInfo } from '../../lib/errorHandler';
+
+interface AuthenticatedRequest extends NextApiRequest {
+  user: User;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
     case 'GET':
-      return withAuth(getUsers)(req, res);
+      return withAuth(asyncHandler(getUsers))(req, res);
     case 'POST':
       if (req.body.action === 'login') {
-        return login(req, res);
+        return asyncHandler(login)(req, res);
       }
-      return createUser(req, res);
+      return asyncHandler(createUser)(req, res);
     case 'PUT':
-      return withAuth(updateUser)(req, res);
+      return withAuth(asyncHandler(updateUser))(req, res);
     case 'DELETE':
-      return withAuth(deleteUser)(req, res);
+      return withAuth(asyncHandler(deleteUser))(req, res);
     default:
       res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
-      res.status(405).end(`Method ${req.method} Not Allowed`);
+      throw new AppError(`Method ${req.method} Not Allowed`, 405);
   }
 }
 
-async function getUsers(req: NextApiRequest, res: NextApiResponse, currentUser: User) {
-  try {
-    const users = db.prepare('SELECT id, username, email FROM Users').all();
-    res.status(200).json(users);
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Error fetching users' });
-  }
+async function getUsers(req: NextApiRequest, res: NextApiResponse) {
+  const users = db.prepare('SELECT id, username, email FROM Users').all();
+  logInfo('Retrieved all users', { count: users.length });
+  res.status(200).json(users);
 }
 
 async function createUser(req: NextApiRequest, res: NextApiResponse) {
   const { username, email, password } = req.body;
   if (!username || !email || !password) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    throw new AppError('Missing required fields', 400);
   }
 
-  try {
-    const result = db.prepare('INSERT INTO Users (username, email, password_hash) VALUES (?, ?, ?)').run(username, email, password);
-    res.status(201).json({ id: result.lastInsertRowid, username, email });
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Error creating user' });
-  }
+  const result = db.prepare('INSERT INTO Users (username, email, password_hash) VALUES (?, ?, ?)').run(username, email, password);
+  logInfo('User created', { id: result.lastInsertRowid, username, email });
+  res.status(201).json({ id: result.lastInsertRowid, username, email });
 }
 
-async function updateUser(req: NextApiRequest, res: NextApiResponse, currentUser: User) {
+async function updateUser(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
   const { username, email, password } = req.body;
+  const currentUser = (req as AuthenticatedRequest).user;
+
   if (!id || (!username && !email && !password)) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    throw new AppError('Missing required fields', 400);
   }
 
   if (currentUser.id !== Number(id)) {
-    return res.status(403).json({ error: 'Not authorized to update this user' });
+    throw new AppError('Not authorized to update this user', 403);
   }
 
-  try {
-    const userExists = db.prepare('SELECT id FROM Users WHERE id = ?').get(id);
-    if (!userExists) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    let query = 'UPDATE Users SET ';
-    const params = [];
-    if (username) {
-      query += 'username = ?, ';
-      params.push(username);
-    }
-    if (email) {
-      query += 'email = ?, ';
-      params.push(email);
-    }
-    if (password) {
-      query += 'password_hash = ?, ';
-      params.push(password);
-    }
-    query = query.slice(0, -2); // Remove last comma and space
-    query += ' WHERE id = ?';
-    params.push(id);
-
-    const result = db.prepare(query).run(...params);
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.status(200).json({ message: 'User updated successfully' });
-  } catch (error) {
-    console.error('Error updating user:', error);
-    res.status(500).json({ error: 'Error updating user' });
+  const userExists = db.prepare('SELECT id FROM Users WHERE id = ?').get(id);
+  if (!userExists) {
+    throw new AppError('User not found', 404);
   }
+
+  let query = 'UPDATE Users SET ';
+  const params = [];
+  if (username) {
+    query += 'username = ?, ';
+    params.push(username);
+  }
+  if (email) {
+    query += 'email = ?, ';
+    params.push(email);
+  }
+  if (password) {
+    query += 'password_hash = ?, ';
+    params.push(password);
+  }
+  query = query.slice(0, -2); // Remove last comma and space
+  query += ' WHERE id = ?';
+  params.push(id);
+
+  const result = db.prepare(query).run(...params);
+  if (result.changes === 0) {
+    throw new AppError('User not found', 404);
+  }
+  logInfo('User updated', { id });
+  res.status(200).json({ message: 'User updated successfully' });
 }
 
-async function deleteUser(req: NextApiRequest, res: NextApiResponse, currentUser: User) {
+async function deleteUser(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
+  const currentUser = (req as AuthenticatedRequest).user;
+
   if (!id) {
-    return res.status(400).json({ error: 'Missing user id' });
+    throw new AppError('Missing user id', 400);
   }
 
   if (currentUser.id !== Number(id)) {
-    return res.status(403).json({ error: 'Not authorized to delete this user' });
+    throw new AppError('Not authorized to delete this user', 403);
   }
 
-  try {
-    const userExists = db.prepare('SELECT id FROM Users WHERE id = ?').get(id);
-    if (!userExists) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const result = db.prepare('DELETE FROM Users WHERE id = ?').run(id);
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.status(200).json({ message: 'User deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting user:', error);
-    res.status(500).json({ error: 'Error deleting user' });
+  const userExists = db.prepare('SELECT id FROM Users WHERE id = ?').get(id);
+  if (!userExists) {
+    throw new AppError('User not found', 404);
   }
+
+  const result = db.prepare('DELETE FROM Users WHERE id = ?').run(id);
+  if (result.changes === 0) {
+    throw new AppError('User not found', 404);
+  }
+  logInfo('User deleted', { id });
+  res.status(200).json({ message: 'User deleted successfully' });
 }
 
 async function login(req: NextApiRequest, res: NextApiResponse) {
   const { email, password } = req.body;
   if (!email || !password) {
-    return res.status(400).json({ error: 'Missing email or password' });
+    throw new AppError('Missing email or password', 400);
   }
 
   const user = authenticateUser(email, password);
   if (!user) {
-    return res.status(401).json({ error: 'Invalid email or password' });
+    throw new AppError('Invalid email or password', 401);
   }
 
   const token = generateToken(user);
+  logInfo('User logged in', { id: user.id, username: user.username });
   res.status(200).json({ token, user: { id: user.id, username: user.username, email: user.email } });
 }

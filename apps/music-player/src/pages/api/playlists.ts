@@ -1,177 +1,165 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import db from '../../lib/db/db';
-import { withAuth, User } from '../../lib/auth';
+import { withAuth } from '../../lib/auth';
+import { asyncHandler, AppError, logInfo, logError } from '../../lib/errorHandler';
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = asyncHandler(async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case 'GET':
-      return withAuth(getPlaylists)(req, res);
+      return getPlaylists(req, res);
     case 'POST':
-      return withAuth(createPlaylist)(req, res);
+      return createPlaylist(req, res);
     case 'PUT':
-      return withAuth(updatePlaylist)(req, res);
+      return updatePlaylist(req, res);
     case 'DELETE':
-      return withAuth(deletePlaylist)(req, res);
+      return deletePlaylist(req, res);
     default:
-      res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
-      res.status(405).end(`Method ${req.method} Not Allowed`);
+      logError('Method not allowed', { method: req.method });
+      throw new AppError('Method not allowed', 405);
   }
-}
+});
 
-async function getPlaylists(req: NextApiRequest, res: NextApiResponse, user: User) {
-  try {
-    const playlists = db.prepare('SELECT id, user_id, name FROM Playlists WHERE user_id = ?').all(user.id);
-    res.status(200).json(playlists);
-  } catch (error) {
-    console.error('Error fetching playlists:', error);
-    res.status(500).json({ error: 'Error fetching playlists' });
-  }
-}
+const getPlaylists = asyncHandler(async (req: NextApiRequest, res: NextApiResponse) => {
+  const playlists = db.prepare('SELECT * FROM Playlists').all();
+  logInfo('Retrieved all playlists', { count: playlists.length });
+  res.status(200).json(playlists);
+});
 
-async function createPlaylist(req: NextApiRequest, res: NextApiResponse, user: User) {
-  const { name } = req.body;
+const createPlaylist = asyncHandler(async (req: NextApiRequest, res: NextApiResponse) => {
+  const { name, description } = req.body;
+
   if (!name) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    logError('Playlist creation failed', { reason: 'Missing name' });
+    throw new AppError('Playlist name is required', 400);
   }
 
-  try {
-    const result = db.prepare('INSERT INTO Playlists (user_id, name) VALUES (?, ?)').run(user.id, name);
-    res.status(201).json({ id: result.lastInsertRowid, user_id: user.id, name });
-  } catch (error) {
-    console.error('Error creating playlist:', error);
-    res.status(500).json({ error: 'Error creating playlist' });
-  }
-}
+  const result = db.prepare('INSERT INTO Playlists (name, description) VALUES (?, ?)').run(name, description);
 
-async function updatePlaylist(req: NextApiRequest, res: NextApiResponse, user: User) {
+  logInfo('Playlist created', { id: result.lastInsertRowid, name });
+  res.status(201).json({
+    id: result.lastInsertRowid,
+    name,
+    description,
+  });
+});
+
+const updatePlaylist = asyncHandler(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
-  const { name } = req.body;
-  if (!id || !name) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  const { name, description } = req.body;
+
+  if (!id || typeof id !== 'string') {
+    logError('Playlist update failed', { reason: 'Invalid ID', id });
+    throw new AppError('Invalid playlist ID', 400);
   }
 
-  try {
-    const result = db.prepare('UPDATE Playlists SET name = ? WHERE id = ? AND user_id = ?').run(name, id, user.id);
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
-    }
-    res.status(200).json({ message: 'Playlist updated successfully' });
-  } catch (error) {
-    console.error('Error updating playlist:', error);
-    res.status(500).json({ error: 'Error updating playlist' });
+  if (!name) {
+    logError('Playlist update failed', { reason: 'Missing name', id });
+    throw new AppError('Playlist name is required', 400);
   }
-}
 
-async function deletePlaylist(req: NextApiRequest, res: NextApiResponse, user: User) {
+  const result = db.prepare('UPDATE Playlists SET name = ?, description = ? WHERE id = ?').run(name, description, id);
+
+  if (result.changes === 0) {
+    logError('Playlist update failed', { reason: 'Playlist not found', id });
+    throw new AppError('Playlist not found', 404);
+  }
+
+  logInfo('Playlist updated', { id, name });
+  res.status(200).json({ message: 'Playlist updated successfully' });
+});
+
+const deletePlaylist = asyncHandler(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
-  if (!id) {
-    return res.status(400).json({ error: 'Missing playlist id' });
+
+  if (!id || typeof id !== 'string') {
+    logError('Playlist deletion failed', { reason: 'Invalid ID', id });
+    throw new AppError('Invalid playlist ID', 400);
   }
 
-  try {
-    const result = db.prepare('DELETE FROM Playlists WHERE id = ? AND user_id = ?').run(id, user.id);
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
-    }
-    // Also delete all entries in PlaylistSongs for this playlist
-    db.prepare('DELETE FROM PlaylistSongs WHERE playlist_id = ?').run(id);
-    res.status(200).json({ message: 'Playlist deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting playlist:', error);
-    res.status(500).json({ error: 'Error deleting playlist' });
-  }
-}
+  const result = db.prepare('DELETE FROM Playlists WHERE id = ?').run(id);
 
-export async function getPlaylistSongs(req: NextApiRequest, res: NextApiResponse, user: User) {
+  if (result.changes === 0) {
+    logError('Playlist deletion failed', { reason: 'Playlist not found', id });
+    throw new AppError('Playlist not found', 404);
+  }
+
+  logInfo('Playlist deleted', { id });
+  res.status(200).json({ message: 'Playlist deleted successfully' });
+});
+
+export const getPlaylistSongs = asyncHandler(async (req: NextApiRequest, res: NextApiResponse) => {
   const { id } = req.query;
-  if (!id) {
-    return res.status(400).json({ error: 'Missing playlist id' });
+
+  if (!id || typeof id !== 'string') {
+    logError('Get playlist songs failed', { reason: 'Invalid ID', id });
+    throw new AppError('Invalid playlist ID', 400);
   }
 
-  try {
-    const playlist = db.prepare('SELECT id FROM Playlists WHERE id = ? AND user_id = ?').get(id, user.id);
-    if (!playlist) {
-      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
-    }
+  const songs = db.prepare(`
+    SELECT s.* FROM Songs s
+    JOIN PlaylistSongs ps ON s.id = ps.song_id
+    WHERE ps.playlist_id = ?
+    ORDER BY ps.order
+  `).all(id);
 
-    const songs = db.prepare(`
-      SELECT s.id, s.title, s.artist, s.album, s.duration, ps.song_order
-      FROM Songs s
-      JOIN PlaylistSongs ps ON s.id = ps.song_id
-      WHERE ps.playlist_id = ?
-      ORDER BY ps.song_order
-    `).all(id);
-    res.status(200).json(songs);
-  } catch (error) {
-    console.error('Error fetching playlist songs:', error);
-    res.status(500).json({ error: 'Error fetching playlist songs' });
-  }
-}
+  logInfo('Retrieved playlist songs', { playlistId: id, songCount: songs.length });
+  res.status(200).json(songs);
+});
 
-export async function addSongToPlaylist(req: NextApiRequest, res: NextApiResponse, user: User) {
-  const { playlist_id, song_id } = req.body;
-  if (!playlist_id || !song_id) {
-    return res.status(400).json({ error: 'Missing required fields' });
+export const addSongToPlaylist = asyncHandler(async (req: NextApiRequest, res: NextApiResponse) => {
+  const { playlistId, songId } = req.body;
+
+  if (!playlistId || !songId) {
+    logError('Add song to playlist failed', { reason: 'Missing IDs', playlistId, songId });
+    throw new AppError('Playlist ID and Song ID are required', 400);
   }
 
-  try {
-    const playlist = db.prepare('SELECT id FROM Playlists WHERE id = ? AND user_id = ?').get(playlist_id, user.id);
-    if (!playlist) {
-      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
-    }
+  const maxOrderResult = db.prepare('SELECT MAX("order") as maxOrder FROM PlaylistSongs WHERE playlist_id = ?').get(playlistId) as { maxOrder: number | null };
+  const newOrder = (maxOrderResult.maxOrder ?? 0) + 1;
 
-    const maxOrderResult = db.prepare('SELECT MAX(song_order) as maxOrder FROM PlaylistSongs WHERE playlist_id = ?').get(playlist_id) as { maxOrder: number | null };
-    const newOrder = (maxOrderResult.maxOrder || 0) + 1;
-    const result = db.prepare('INSERT INTO PlaylistSongs (playlist_id, song_id, song_order) VALUES (?, ?, ?)').run(playlist_id, song_id, newOrder);
-    res.status(201).json({ id: result.lastInsertRowid, playlist_id, song_id, song_order: newOrder });
-  } catch (error) {
-    console.error('Error adding song to playlist:', error);
-    res.status(500).json({ error: 'Error adding song to playlist' });
-  }
-}
+  db.prepare('INSERT INTO PlaylistSongs (playlist_id, song_id, "order") VALUES (?, ?, ?)').run(playlistId, songId, newOrder);
 
-export async function removeSongFromPlaylist(req: NextApiRequest, res: NextApiResponse, user: User) {
-  const { playlist_id, song_id } = req.query;
-  if (!playlist_id || !song_id) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  logInfo('Song added to playlist', { playlistId, songId, order: newOrder });
+  res.status(200).json({ message: 'Song added to playlist successfully' });
+});
+
+export const removeSongFromPlaylist = asyncHandler(async (req: NextApiRequest, res: NextApiResponse) => {
+  const { playlistId, songId } = req.body;
+
+  if (!playlistId || !songId) {
+    logError('Remove song from playlist failed', { reason: 'Missing IDs', playlistId, songId });
+    throw new AppError('Playlist ID and Song ID are required', 400);
   }
 
-  try {
-    const playlist = db.prepare('SELECT id FROM Playlists WHERE id = ? AND user_id = ?').get(playlist_id, user.id);
-    if (!playlist) {
-      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
-    }
+  const result = db.prepare('DELETE FROM PlaylistSongs WHERE playlist_id = ? AND song_id = ?').run(playlistId, songId);
 
-    const result = db.prepare('DELETE FROM PlaylistSongs WHERE playlist_id = ? AND song_id = ?').run(playlist_id, song_id);
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'Song not found in playlist' });
-    }
-    res.status(200).json({ message: 'Song removed from playlist successfully' });
-  } catch (error) {
-    console.error('Error removing song from playlist:', error);
-    res.status(500).json({ error: 'Error removing song from playlist' });
-  }
-}
-
-export async function updatePlaylistSongOrder(req: NextApiRequest, res: NextApiResponse, user: User) {
-  const { playlist_id, song_id, new_order } = req.body;
-  if (!playlist_id || !song_id || new_order === undefined) {
-    return res.status(400).json({ error: 'Missing required fields' });
+  if (result.changes === 0) {
+    logError('Remove song from playlist failed', { reason: 'Song not found in playlist', playlistId, songId });
+    throw new AppError('Song not found in playlist', 404);
   }
 
-  try {
-    const playlist = db.prepare('SELECT id FROM Playlists WHERE id = ? AND user_id = ?').get(playlist_id, user.id);
-    if (!playlist) {
-      return res.status(404).json({ error: 'Playlist not found or not owned by user' });
-    }
+  logInfo('Song removed from playlist', { playlistId, songId });
+  res.status(200).json({ message: 'Song removed from playlist successfully' });
+});
 
-    const result = db.prepare('UPDATE PlaylistSongs SET song_order = ? WHERE playlist_id = ? AND song_id = ?').run(new_order, playlist_id, song_id);
-    if (result.changes === 0) {
-      return res.status(404).json({ error: 'Song not found in playlist' });
-    }
-    res.status(200).json({ message: 'Playlist song order updated successfully' });
-  } catch (error) {
-    console.error('Error updating playlist song order:', error);
-    res.status(500).json({ error: 'Error updating playlist song order' });
+export const updatePlaylistSongOrder = asyncHandler(async (req: NextApiRequest, res: NextApiResponse) => {
+  const { playlistId, songOrder } = req.body;
+
+  if (!playlistId || !songOrder || !Array.isArray(songOrder)) {
+    logError('Update playlist song order failed', { reason: 'Invalid input', playlistId, songOrder });
+    throw new AppError('Invalid input', 400);
   }
-}
+
+  const updateStmt = db.prepare('UPDATE PlaylistSongs SET "order" = ? WHERE playlist_id = ? AND song_id = ?');
+
+  db.transaction(() => {
+    songOrder.forEach((songId, index) => {
+      updateStmt.run(index + 1, playlistId, songId);
+    });
+  })();
+
+  logInfo('Playlist song order updated', { playlistId, songCount: songOrder.length });
+  res.status(200).json({ message: 'Playlist song order updated successfully' });
+});
+
+export default withAuth(handler);

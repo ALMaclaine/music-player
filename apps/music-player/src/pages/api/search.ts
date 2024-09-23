@@ -1,34 +1,40 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import db from '../../lib/db/db';
 import { withAuth } from '../../lib/auth';
+import { asyncHandler, AppError, logInfo, logError } from '../../lib/errorHandler';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = asyncHandler(async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    logError('Invalid method for search', { method: req.method });
+    throw new AppError('Method not allowed', 405);
   }
 
   const { q } = req.query;
 
   if (!q || typeof q !== 'string') {
-    return res.status(400).json({ error: 'Search query is required' });
+    logError('Invalid search query', { query: q });
+    throw new AppError('Search query is required', 400);
   }
 
-  try {
-    const songs = db.prepare(`
-      SELECT * FROM Songs
-      WHERE title LIKE ? OR artist LIKE ? OR album LIKE ?
-    `).all(`%${q}%`, `%${q}%`, `%${q}%`);
+  logInfo('Performing search', { query: q });
 
-    const playlists = db.prepare(`
-      SELECT * FROM Playlists
-      WHERE name LIKE ?
-    `).all(`%${q}%`);
+  const songs = db.prepare(`
+    SELECT * FROM Songs
+    WHERE title LIKE ? OR artist LIKE ? OR album LIKE ?
+  `).all(`%${q}%`, `%${q}%`, `%${q}%`);
 
-    res.status(200).json({ songs, playlists });
-  } catch (error) {
-    console.error('Error searching:', error);
-    res.status(500).json({ error: 'Error performing search' });
-  }
-};
+  const playlists = db.prepare(`
+    SELECT * FROM Playlists
+    WHERE name LIKE ?
+  `).all(`%${q}%`);
+
+  logInfo('Search completed', { 
+    query: q, 
+    songsFound: songs.length, 
+    playlistsFound: playlists.length 
+  });
+
+  res.status(200).json({ songs, playlists });
+});
 
 export default withAuth(handler);
