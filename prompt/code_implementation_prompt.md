@@ -24,8 +24,15 @@ Use this prompt when implementing new features, creating new files, or modifying
 
 7. If the implementation involves multiple files or components, explain how they interact.
 
-8. After implementation, summarize the changes made and any important notes for future reference.
+8. Write unit tests for the new functionality:
+   - Create a new test file if one doesn't exist, or add to the existing test file.
+   - Write tests that cover the main functionality, edge cases, and potential error scenarios.
+   - Ensure all tests pass before considering the implementation complete.
 
-9. Suggest any necessary updates to documentation or tests based on the implementation.
+9. After implementation and testing, summarize the changes made and any important notes for future reference.
 
-Remember to keep the code modular, maintainable, and in line with the project's architecture and design principles.
+10. Update any relevant documentation based on the implementation.
+
+11. Suggest any necessary updates to other parts of the codebase that might be affected by these changes.
+
+Remember to keep the code modular, maintainable, and in line with the project's architecture and design principles. Always prioritize writing tests alongside the implementation to ensure code reliability and ease of future modifications.

@@ -25,19 +25,28 @@ Use this prompt to determine the next action to take in the project based on the
 
 8. Before proceeding, check if there are any relevant prompts for the specific action (e.g., code_implementation_prompt.md, testing_prompt.md, etc.) and follow them as appropriate.
 
-9. Provide a clear, concise description of the next action to take, including:
-   - The specific task to be performed
-   - Any files or directories that will be affected
-   - Any dependencies or prerequisites for this action
+9. If the action involves code implementation:
+   - Follow the code_implementation_prompt.md closely
+   - Ensure that unit tests are written alongside the implementation
+   - Verify that tests cover main functionality, edge cases, and potential error scenarios
 
-10. If there are multiple possible next actions, list them in order of priority.
+10. Provide a clear, concise description of the next action to take, including:
+    - The specific task to be performed
+    - Any files or directories that will be affected
+    - Any dependencies or prerequisites for this action
+    - The corresponding test file(s) to be created or updated
 
-11. If the next action requires any decisions to be made, clearly state the options and provide recommendations based on best practices and the project requirements.
+11. If there are multiple possible next actions, list them in order of priority.
 
-12. After completing the task:
-    - Commit your changes (refer to Git Workflow Prompt, step 3)
+12. If the next action requires any decisions to be made, clearly state the options and provide recommendations based on best practices and the project requirements.
+
+13. After completing the task:
+    - Run all tests to ensure they pass
+    - Commit your changes, including both implementation and tests (refer to Git Workflow Prompt, step 3)
     - Merge the feature branch to master and delete the feature branch (refer to Git Workflow Prompt, step 5)
     - Update the `progress.json` file to reflect the completed task
     - Commit and push the progress update to master (refer to Git Workflow Prompt, step 3)
 
-Remember to consider the overall project goals and maintain consistency with the existing project structure and coding standards when determining the next action. Always refer to and follow relevant prompts throughout the process.
+14. If the completed task affects other parts of the project, suggest any necessary updates or refactoring.
+
+Remember to consider the overall project goals and maintain consistency with the existing project structure and coding standards when determining the next action. Always prioritize writing tests alongside implementation to ensure code reliability and ease of future modifications. Refer to and follow relevant prompts throughout the process.
