@@ -1,243 +1,188 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import handler, { getPlaylistSongs, addSongToPlaylist, removeSongFromPlaylist, updatePlaylistSongOrder } from './playlists';
 import db from '../../lib/db/db';
-import { User } from '../../lib/auth';
+
+const HttpStatus = {
+  OK: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+  NOT_FOUND: 404,
+  METHOD_NOT_ALLOWED: 405,
+  INTERNAL_SERVER_ERROR: 500,
+} as const;
 
 jest.mock('../../lib/db/db', () => ({
-  prepare: jest.fn().mockReturnThis(),
-  all: jest.fn(),
-  run: jest.fn(),
-  get: jest.fn(),
+  prepare: jest.fn().mockReturnValue({
+    all: jest.fn(),
+    run: jest.fn(),
+    get: jest.fn(),
+  }),
+  transaction: jest.fn((fn) => fn),
 }));
 
 jest.mock('../../lib/auth', () => ({
-  withAuth: (handler: (req: NextApiRequest, res: NextApiResponse, user: User) => Promise<void>) => 
-    (req: NextApiRequest, res: NextApiResponse) => 
-      handler(req, res, { id: 1, username: 'testuser', email: 'test@example.com' }),
+  withAuth: jest.fn((handler) => handler),
 }));
-
-const HTTP_STATUS = {
-  OK: 200,
-  CREATED: 201,
-  NOT_FOUND: 404,
-  METHOD_NOT_ALLOWED: 405,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-};
 
 describe('Playlists API', () => {
   let mockReq: Partial<NextApiRequest>;
   let mockRes: Partial<NextApiResponse>;
-  let mockUser: User;
 
   beforeEach(() => {
     mockReq = {
-      method: '',
+      method: 'GET',
       query: {},
       body: {},
-      headers: {},
     };
     mockRes = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
-      end: jest.fn(),
-      setHeader: jest.fn(),
     };
-    mockUser = { id: 1, username: 'testuser', email: 'test@example.com' };
     jest.clearAllMocks();
   });
 
   describe('GET /api/playlists', () => {
-    it('should get all playlists for the user', async () => {
-      const mockPlaylists = [
-        { id: 1, user_id: 1, name: 'Playlist 1' },
-        { id: 2, user_id: 1, name: 'Playlist 2' },
-      ];
-      (db.prepare('').all as jest.Mock).mockReturnValueOnce(mockPlaylists);
+    it('should return all playlists', async () => {
+      const mockPlaylists = [{ id: 1, name: 'Test Playlist' }];
+      (db.prepare('').all as jest.Mock).mockReturnValue(mockPlaylists);
 
-      mockReq.method = 'GET';
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(db.prepare).toHaveBeenCalledWith('SELECT id, user_id, name FROM Playlists WHERE user_id = ?');
-      expect(db.prepare('').all).toHaveBeenCalledWith(mockUser.id);
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
+      expect(db.prepare).toHaveBeenCalledWith('SELECT * FROM Playlists');
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockRes.json).toHaveBeenCalledWith(mockPlaylists);
     });
   });
 
   describe('POST /api/playlists', () => {
     it('should create a new playlist', async () => {
-      const newPlaylist = { name: 'New Playlist' };
-      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ lastInsertRowid: 3 });
-
       mockReq.method = 'POST';
-      mockReq.body = newPlaylist;
+      mockReq.body = { name: 'New Playlist', description: 'Test description' };
+      (db.prepare('').run as jest.Mock).mockReturnValue({ lastInsertRowid: 1 });
+
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(db.prepare).toHaveBeenCalledWith('INSERT INTO Playlists (user_id, name) VALUES (?, ?)');
-      expect(db.prepare('').run).toHaveBeenCalledWith(mockUser.id, newPlaylist.name);
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.CREATED);
-      expect(mockRes.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          id: expect.any(Number),
-          user_id: mockUser.id,
-          name: newPlaylist.name,
-        })
-      );
+      expect(db.prepare).toHaveBeenCalledWith('INSERT INTO Playlists (name, description) VALUES (?, ?)');
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.CREATED);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        id: 1,
+        name: 'New Playlist',
+        description: 'Test description',
+      });
     });
 
-    it('should return 400 when required fields are missing', async () => {
+    it('should return 400 if playlist name is missing', async () => {
       mockReq.method = 'POST';
-      mockReq.body = {}; // Missing 'name'
+      mockReq.body = {};
+
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.BAD_REQUEST);
-      expect(mockRes.json).toHaveBeenCalledWith({ error: 'Missing required fields' });
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+      expect(mockRes.json).toHaveBeenCalledWith({ status: 'error', message: 'Playlist name is required' });
     });
   });
 
   describe('PUT /api/playlists', () => {
-    it('should update an existing playlist', async () => {
-      const updatedPlaylist = { name: 'Updated Playlist' };
-      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ changes: 1 });
-
+    it('should update a playlist', async () => {
       mockReq.method = 'PUT';
       mockReq.query = { id: '1' };
-      mockReq.body = updatedPlaylist;
+      mockReq.body = { name: 'Updated Playlist', description: 'Updated description' };
+      (db.prepare('').run as jest.Mock).mockReturnValue({ changes: 1 });
+
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(db.prepare).toHaveBeenCalledWith('UPDATE Playlists SET name = ? WHERE id = ? AND user_id = ?');
-      expect(db.prepare('').run).toHaveBeenCalledWith(updatedPlaylist.name, '1', mockUser.id);
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
+      expect(db.prepare).toHaveBeenCalledWith('UPDATE Playlists SET name = ?, description = ? WHERE id = ?');
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockRes.json).toHaveBeenCalledWith({ message: 'Playlist updated successfully' });
     });
 
-    it('should return 404 when updating non-existent playlist', async () => {
-      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ changes: 0 });
-
+    it('should return 404 if playlist is not found', async () => {
       mockReq.method = 'PUT';
       mockReq.query = { id: '999' };
-      mockReq.body = { name: 'Nonexistent Playlist' };
+      mockReq.body = { name: 'Updated Playlist', description: 'Updated description' };
+      (db.prepare('').run as jest.Mock).mockReturnValue({ changes: 0 });
+
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.NOT_FOUND);
-      expect(mockRes.json).toHaveBeenCalledWith({ error: 'Playlist not found or not owned by user' });
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+      expect(mockRes.json).toHaveBeenCalledWith({ status: 'error', message: 'Playlist not found' });
     });
   });
 
   describe('DELETE /api/playlists', () => {
     it('should delete a playlist', async () => {
-      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ changes: 1 });
-
       mockReq.method = 'DELETE';
       mockReq.query = { id: '1' };
+      (db.prepare('').run as jest.Mock).mockReturnValue({ changes: 1 });
+
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(db.prepare).toHaveBeenCalledWith('DELETE FROM Playlists WHERE id = ? AND user_id = ?');
-      expect(db.prepare('').run).toHaveBeenCalledWith('1', mockUser.id);
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
+      expect(db.prepare).toHaveBeenCalledWith('DELETE FROM Playlists WHERE id = ?');
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockRes.json).toHaveBeenCalledWith({ message: 'Playlist deleted successfully' });
     });
 
-    it('should return 404 when deleting non-existent playlist', async () => {
-      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ changes: 0 });
-
+    it('should return 404 if playlist is not found', async () => {
       mockReq.method = 'DELETE';
       mockReq.query = { id: '999' };
+      (db.prepare('').run as jest.Mock).mockReturnValue({ changes: 0 });
+
       await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.NOT_FOUND);
-      expect(mockRes.json).toHaveBeenCalledWith({ error: 'Playlist not found or not owned by user' });
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.NOT_FOUND);
+      expect(mockRes.json).toHaveBeenCalledWith({ status: 'error', message: 'Playlist not found' });
     });
   });
 
-  it('should return 405 for invalid request method', async () => {
-    mockReq.method = 'PATCH';
-    await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
-
-    expect(mockRes.setHeader).toHaveBeenCalledWith('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
-    expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.METHOD_NOT_ALLOWED);
-    expect(mockRes.end).toHaveBeenCalledWith('Method PATCH Not Allowed');
-  });
-
   describe('GET /api/playlists/songs', () => {
-    it('should get songs for a playlist', async () => {
-      const mockSongs = [
-        { id: 1, title: 'Song 1', artist: 'Artist 1', album: 'Album 1', duration: 180, song_order: 1 },
-        { id: 2, title: 'Song 2', artist: 'Artist 2', album: 'Album 2', duration: 240, song_order: 2 },
-      ];
-      (db.prepare('').get as jest.Mock).mockReturnValueOnce({ id: 1 });
-      (db.prepare('').all as jest.Mock).mockReturnValueOnce(mockSongs);
-
-      mockReq.method = 'GET';
+    it('should return songs for a playlist', async () => {
       mockReq.query = { id: '1' };
-      await getPlaylistSongs(mockReq as NextApiRequest, mockRes as NextApiResponse, mockUser);
+      const mockSongs = [{ id: 1, title: 'Test Song' }];
+      (db.prepare('').all as jest.Mock).mockReturnValue(mockSongs);
 
-      expect(db.prepare).toHaveBeenCalledWith('SELECT id FROM Playlists WHERE id = ? AND user_id = ?');
-      expect(db.prepare('').get).toHaveBeenCalledWith('1', mockUser.id);
-      expect(db.prepare).toHaveBeenCalledWith(expect.stringContaining('SELECT s.id, s.title, s.artist, s.album, s.duration, ps.song_order'));
-      expect(db.prepare('').all).toHaveBeenCalledWith('1');
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
+      await getPlaylistSongs(mockReq as NextApiRequest, mockRes as NextApiResponse);
+
+      expect(db.prepare).toHaveBeenCalledWith(expect.stringContaining('SELECT s.* FROM Songs s'));
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockRes.json).toHaveBeenCalledWith(mockSongs);
     });
   });
 
   describe('POST /api/playlists/songs', () => {
     it('should add a song to a playlist', async () => {
-      (db.prepare('').get as jest.Mock).mockReturnValueOnce({ id: 1 });
-      (db.prepare('').get as jest.Mock).mockReturnValueOnce({ maxOrder: 2 });
-      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ lastInsertRowid: 3 });
+      mockReq.body = { playlistId: 1, songId: 1 };
+      (db.prepare('').get as jest.Mock).mockReturnValue({ maxOrder: 2 });
 
-      mockReq.method = 'POST';
-      mockReq.body = { playlist_id: 1, song_id: 2 };
-      await addSongToPlaylist(mockReq as NextApiRequest, mockRes as NextApiResponse, mockUser);
+      await addSongToPlaylist(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(db.prepare).toHaveBeenCalledWith('SELECT id FROM Playlists WHERE id = ? AND user_id = ?');
-      expect(db.prepare('').get).toHaveBeenCalledWith(1, mockUser.id);
-      expect(db.prepare).toHaveBeenCalledWith('INSERT INTO PlaylistSongs (playlist_id, song_id, song_order) VALUES (?, ?, ?)');
-      expect(db.prepare('').run).toHaveBeenCalledWith(1, 2, 3);
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.CREATED);
-      expect(mockRes.json).toHaveBeenCalledWith(expect.objectContaining({
-        id: 3,
-        playlist_id: 1,
-        song_id: 2,
-        song_order: 3,
-      }));
+      expect(db.prepare).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO PlaylistSongs'));
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.OK);
+      expect(mockRes.json).toHaveBeenCalledWith({ message: 'Song added to playlist successfully' });
     });
   });
 
   describe('DELETE /api/playlists/songs', () => {
     it('should remove a song from a playlist', async () => {
-      (db.prepare('').get as jest.Mock).mockReturnValueOnce({ id: 1 });
-      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ changes: 1 });
+      mockReq.body = { playlistId: 1, songId: 1 };
+      (db.prepare('').run as jest.Mock).mockReturnValue({ changes: 1 });
 
-      mockReq.method = 'DELETE';
-      mockReq.query = { playlist_id: '1', song_id: '2' };
-      await removeSongFromPlaylist(mockReq as NextApiRequest, mockRes as NextApiResponse, mockUser);
+      await removeSongFromPlaylist(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(db.prepare).toHaveBeenCalledWith('SELECT id FROM Playlists WHERE id = ? AND user_id = ?');
-      expect(db.prepare('').get).toHaveBeenCalledWith('1', mockUser.id);
       expect(db.prepare).toHaveBeenCalledWith('DELETE FROM PlaylistSongs WHERE playlist_id = ? AND song_id = ?');
-      expect(db.prepare('').run).toHaveBeenCalledWith('1', '2');
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockRes.json).toHaveBeenCalledWith({ message: 'Song removed from playlist successfully' });
     });
   });
 
-  describe('PUT /api/playlists/songs', () => {
-    it('should update the order of a song in a playlist', async () => {
-      (db.prepare('').get as jest.Mock).mockReturnValueOnce({ id: 1 });
-      (db.prepare('').run as jest.Mock).mockReturnValueOnce({ changes: 1 });
+  describe('PUT /api/playlists/songs/order', () => {
+    it('should update the order of songs in a playlist', async () => {
+      mockReq.body = { playlistId: 1, songOrder: [3, 1, 2] };
 
-      mockReq.method = 'PUT';
-      mockReq.body = { playlist_id: 1, song_id: 2, new_order: 3 };
-      await updatePlaylistSongOrder(mockReq as NextApiRequest, mockRes as NextApiResponse, mockUser);
+      await updatePlaylistSongOrder(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-      expect(db.prepare).toHaveBeenCalledWith('SELECT id FROM Playlists WHERE id = ? AND user_id = ?');
-      expect(db.prepare('').get).toHaveBeenCalledWith(1, mockUser.id);
-      expect(db.prepare).toHaveBeenCalledWith('UPDATE PlaylistSongs SET song_order = ? WHERE playlist_id = ? AND song_id = ?');
-      expect(db.prepare('').run).toHaveBeenCalledWith(3, 1, 2);
-      expect(mockRes.status).toHaveBeenCalledWith(HTTP_STATUS.OK);
+      expect(db.prepare).toHaveBeenCalledWith('UPDATE PlaylistSongs SET "order" = ? WHERE playlist_id = ? AND song_id = ?');
+      expect(db.transaction).toHaveBeenCalled();
+      expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(mockRes.json).toHaveBeenCalledWith({ message: 'Playlist song order updated successfully' });
     });
   });

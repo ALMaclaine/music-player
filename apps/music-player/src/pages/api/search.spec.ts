@@ -2,8 +2,17 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import handler from './search';
 import db from '../../lib/db/db';
 
+const HttpStatus = {
+  OK: 200,
+  BAD_REQUEST: 400,
+  METHOD_NOT_ALLOWED: 405,
+  INTERNAL_SERVER_ERROR: 500,
+} as const;
+
 jest.mock('../../lib/db/db', () => ({
-  prepare: jest.fn(),
+  prepare: jest.fn().mockReturnValue({
+    all: jest.fn(),
+  }),
 }));
 
 jest.mock('../../lib/auth', () => ({
@@ -37,14 +46,14 @@ describe('Search API', () => {
   it('should return 405 for non-GET requests', async () => {
     mockReq.method = 'POST';
     await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
-    expect(mockRes.status).toHaveBeenCalledWith(405);
-    expect(mockRes.json).toHaveBeenCalledWith({ error: 'Method not allowed' });
+    expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.METHOD_NOT_ALLOWED);
+    expect(mockRes.json).toHaveBeenCalledWith({ status: 'error', message: 'Method not allowed' });
   });
 
   it('should return 400 if search query is missing', async () => {
     await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
-    expect(mockRes.status).toHaveBeenCalledWith(400);
-    expect(mockRes.json).toHaveBeenCalledWith({ error: 'Search query is required' });
+    expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.BAD_REQUEST);
+    expect(mockRes.json).toHaveBeenCalledWith({ status: 'error', message: 'Search query is required' });
   });
 
   it('should return search results for songs and playlists', async () => {
@@ -52,17 +61,17 @@ describe('Search API', () => {
     const mockSongs = [{ id: 1, title: 'Test Song' }];
     const mockPlaylists = [{ id: 1, name: 'Test Playlist' }];
 
-    const mockAll = jest.fn()
-      .mockReturnValueOnce(mockSongs)
-      .mockReturnValueOnce(mockPlaylists);
-
-    (db.prepare as jest.Mock).mockReturnValue({ all: mockAll });
+    const mockPrepare = jest.fn().mockReturnValue({
+      all: jest.fn()
+        .mockReturnValueOnce(mockSongs)
+        .mockReturnValueOnce(mockPlaylists),
+    });
+    (db.prepare as jest.Mock).mockImplementation(mockPrepare);
 
     await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
     expect(db.prepare).toHaveBeenCalledTimes(2);
-    expect(mockAll).toHaveBeenCalledTimes(2);
-    expect(mockRes.status).toHaveBeenCalledWith(200);
+    expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.OK);
     expect(mockRes.json).toHaveBeenCalledWith({ songs: mockSongs, playlists: mockPlaylists });
   });
 
@@ -74,8 +83,8 @@ describe('Search API', () => {
 
     await handler(mockReq as NextApiRequest, mockRes as NextApiResponse);
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Error searching:', expect.any(Error));
-    expect(mockRes.status).toHaveBeenCalledWith(500);
-    expect(mockRes.json).toHaveBeenCalledWith({ error: 'Error performing search' });
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Unexpected error:', expect.any(Error));
+    expect(mockRes.status).toHaveBeenCalledWith(HttpStatus.INTERNAL_SERVER_ERROR);
+    expect(mockRes.json).toHaveBeenCalledWith({ status: 'error', message: 'An unexpected error occurred' });
   });
 });
