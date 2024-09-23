@@ -15,13 +15,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="flex h-screen bg-gray-100">
-        <Sidebar />
-        <div className="flex flex-col flex-1">
-          <main className="flex-1 overflow-y-auto">
-            {children}
-          </main>
-          <FooterPlayer />
+      <body className="bg-gray-100">
+        <div className="flex h-screen">
+          <Sidebar />
+          <div className="flex-1 flex flex-col md:ml-64">
+            <main className="flex-1 overflow-y-auto p-4 pb-24">
+              {children}
+            </main>
+            <FooterPlayer />
+          </div>
         </div>
       </body>
     </html>

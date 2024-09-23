@@ -14,8 +14,7 @@ export async function GET() {
     const featuredAlbums = db.prepare(`
       SELECT DISTINCT a.id, a.title, ar.name as artist, a.cover_image
       FROM Albums a
-      JOIN Songs s ON s.album_id = a.id
-      JOIN Artists ar ON ar.id = s.artist_id
+      JOIN Artists ar ON ar.id = a.artist_id
       ORDER BY RANDOM()
       LIMIT 4
     `).all() as Album[];

@@ -30,3 +30,157 @@
 {"level":"info","message":"Song removed from playlist","playlistId":1,"songId":1,"timestamp":"2024-09-23T03:22:01.892Z"}
 {"level":"info","message":"Playlist song order updated","playlistId":1,"songCount":3,"timestamp":"2024-09-23T03:22:01.892Z"}
 {"error":{},"level":"error","message":"Unexpected error:","stack":"TypeError: Cannot read properties of undefined (reading 'id')\n    at _callee5$ (/Users/alm/WebstormProjects/music-player/apps/music-player/src/pages/api/users.ts:98:19)\n    at tryCatch (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:45:16)\n    at Generator.<anonymous> (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:133:17)\n    at Generator.next (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:74:21)\n    at asyncGeneratorStep (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)\n    at _next (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)\n    at /Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7\n    at new Promise (<anonymous>)\n    at apply (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)\n    at fn (/Users/alm/WebstormProjects/music-player/apps/music-player/src/pages/api/users.ts:90:26)\n    at _callee$ (/Users/alm/WebstormProjects/music-player/apps/music-player/src/lib/errorHandler.ts:61:13)\n    at tryCatch (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:45:16)\n    at Generator.<anonymous> (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:133:17)\n    at Generator.next (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:74:21)\n    at asyncGeneratorStep (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)\n    at _next (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)\n    at /Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7\n    at new Promise (<anonymous>)\n    at apply (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)\n    at handler (/Users/alm/WebstormProjects/music-player/apps/music-player/src/lib/errorHandler.ts:65:4)\n    at /Users/alm/WebstormProjects/music-player/apps/music-player/src/pages/api/users.spec.ts:16:7\n    at _callee$ (/Users/alm/WebstormProjects/music-player/apps/music-player/src/pages/api/users.ts:22:48)\n    at tryCatch (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:45:16)\n    at Generator.<anonymous> (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:133:17)\n    at Generator.next (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:74:21)\n    at asyncGeneratorStep (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)\n    at _next (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)\n    at /Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7\n    at new Promise (<anonymous>)\n    at apply (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)\n    at handler (/Users/alm/WebstormProjects/music-player/apps/music-player/src/pages/api/users.ts:10:38)\n    at _callee8$ (/Users/alm/WebstormProjects/music-player/apps/music-player/src/pages/api/users.spec.ts:160:20)\n    at tryCatch (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:45:16)\n    at Generator.<anonymous> (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:133:17)\n    at Generator.next (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/regeneratorRuntime.js:74:21)\n    at asyncGeneratorStep (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)\n    at _next (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)\n    at /Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7\n    at new Promise (<anonymous>)\n    at Object.<anonymous> (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/@babel+runtime@7.25.6/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)\n    at Promise.then.completed (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:298:28)\n    at new Promise (<anonymous>)\n    at callAsyncCircusFn (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/utils.js:231:10)\n    at _callCircusTest (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:316:40)\n    at async _runTest (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:252:3)\n    at async _runTestsForDescribeBlock (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:126:9)\n    at async _runTestsForDescribeBlock (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)\n    at async _runTestsForDescribeBlock (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:121:9)\n    at async run (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/run.js:71:3)\n    at async runAndTransformResultsToJestFormat (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapterInit.js:122:21)\n    at async jestAdapter (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-circus@29.7.0/node_modules/jest-circus/build/legacy-code-todo-rewrite/jestAdapter.js:79:19)\n    at async runTestInternal (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:367:16)\n    at async runTest (/Users/alm/WebstormProjects/music-player/node_modules/.pnpm/jest-runner@29.7.0/node_modules/jest-runner/build/runTest.js:444:34)","timestamp":"2024-09-23T03:22:01.976Z"}
+{"error":"no such table: Albums","level":"error","message":"Error fetching featured albums","timestamp":"2024-09-23T04:52:07.140Z"}
+{"error":"no such table: Albums","level":"error","message":"Error fetching featured albums","timestamp":"2024-09-23T04:52:07.143Z"}
+{"error":"no such table: Albums","level":"error","message":"Error fetching featured albums","timestamp":"2024-09-23T04:52:22.029Z"}
+{"error":"no such table: Albums","level":"error","message":"Error fetching featured albums","timestamp":"2024-09-23T04:52:36.318Z"}
+{"error":"no such table: Albums","level":"error","message":"Error fetching featured albums","timestamp":"2024-09-23T04:52:37.349Z"}
+{"error":"no such table: Albums","level":"error","message":"Error fetching featured albums","timestamp":"2024-09-23T04:52:38.056Z"}
+{"error":"no such table: Albums","level":"error","message":"Error fetching featured albums","timestamp":"2024-09-23T04:52:51.005Z"}
+{"error":"no such table: Albums","level":"error","message":"Error fetching featured albums","timestamp":"2024-09-23T04:52:51.015Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:55:06.718Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:55:06.739Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:55:45.955Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:55:45.959Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:55:59.004Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:55:59.005Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:56:04.845Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:56:04.854Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:56:13.487Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:56:15.156Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:56:15.177Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:56:30.892Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:56:30.903Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:58:16.782Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:58:16.792Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:59:38.183Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T04:59:38.220Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:00:38.379Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:00:38.385Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:00:54.120Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:00:54.128Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:01:23.484Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:01:23.491Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:01:32.123Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:01:32.128Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:02:26.541Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:02:26.550Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:02:33.606Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:02:36.069Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:02:36.712Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:02:57.445Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:02:59.752Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:03:15.697Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:03:43.374Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:03:46.150Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:04:44.568Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:04:44.583Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:05:07.028Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:05:20.999Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:05:26.399Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:06:03.656Z"}
+{"error":"no such column: s.cover_image","level":"error","message":"Error fetching daily mix and playlists","timestamp":"2024-09-23T05:06:03.856Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:06:47.515Z"}
+{"dailyMixCount":0,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":0,"timestamp":"2024-09-23T05:06:47.522Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:07:26.994Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:07:27.000Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:08:44.042Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:08:44.046Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:08:56.922Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:08:56.927Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:00.597Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:00.601Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:02.387Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:02.400Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:02.646Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:02.653Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:02.783Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:02.785Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:11.315Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:11.321Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:11.747Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:11.753Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:12.027Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:12.033Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:12.384Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:12.388Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:12.758Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:12.762Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:13.162Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:13.168Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:09:13.652Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:09:13.656Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:11:12.250Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:11:12.253Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:11:46.603Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:11:46.615Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:11:49.273Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:11:49.278Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:12:02.174Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:12:02.180Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:12:03.651Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:12:03.653Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:12:03.978Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:12:03.982Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:12:04.279Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:12:04.283Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:12:05.005Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:12:05.008Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:12:06.007Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:12:06.012Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:12:37.433Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:12:37.438Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:12:51.026Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:12:51.032Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:13:08.615Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:13:08.622Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:13:26.194Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:13:26.199Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:13:38.688Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:13:38.692Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:13:39.698Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:13:39.700Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:13:39.763Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:13:39.765Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:15:32.245Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:15:32.250Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:15:52.973Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:15:52.979Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:18:04.251Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:18:04.255Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:18:52.467Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:18:52.475Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:18:55.868Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:18:55.872Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:18:56.757Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:18:56.761Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:20:41.088Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:20:41.091Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:20:51.858Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:20:51.866Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:20:56.657Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:20:56.667Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:24:50.884Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:24:50.885Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:24:50.890Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:24:50.891Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:25:06.167Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:25:06.175Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:25:41.504Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:25:41.511Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:26:25.514Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:26:25.521Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:33:25.513Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:33:25.517Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:33:27.313Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:33:27.318Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:33:37.068Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:33:37.076Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:36:10.456Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:36:10.460Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:36:13.191Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:36:13.209Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:36:26.117Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:36:26.124Z"}
+{"dailyMixCount":2,"level":"info","message":"Retrieved daily mix and playlists","playlistsCount":2,"timestamp":"2024-09-23T05:37:30.706Z"}
+{"count":4,"level":"info","message":"Retrieved featured albums","timestamp":"2024-09-23T05:37:30.712Z"}

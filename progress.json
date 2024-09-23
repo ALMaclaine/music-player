@@ -58,9 +58,9 @@
         {"name": "Implement Main Content Area", "status": "completed"},
         {"name": "Create Footer Music Player", "status": "completed"},
         {"name": "Apply Tailwind CSS Styling", "status": "completed"},
-        {"name": "Create Featured Albums Section", "status": "in_progress"},
-        {"name": "Implement Daily Mix and Playlists Section", "status": "pending"},
-        {"name": "Implement Responsive Design", "status": "pending"},
+        {"name": "Create Featured Albums Section", "status": "completed"},
+        {"name": "Implement Daily Mix and Playlists Section", "status": "completed"},
+        {"name": "Implement Responsive Design", "status": "completed"},
         {"name": "Ensure Accessibility", "status": "pending"},
         {"name": "Perform Final Testing and Optimization", "status": "pending"}
       ]
